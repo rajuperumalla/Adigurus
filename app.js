@@ -1,18 +1,158 @@
-// app.js — Adiguru's Full Cart System
+// app.js — Adiguru's Full Cart System (SECURED & OPTIMIZED)
 
 // ══════════════════════════════════════════════════════════
-//  CART ENGINE  (localStorage-backed)
+//  CONFIGURATION
+// ══════════════════════════════════════════════════════════
+const CONFIG = {
+    currency: '₹',
+    currencyCode: 'INR',
+    locale: 'en-IN',
+    freeShippingThreshold: 499,
+    shippingCost: 50
+};
+
+// ══════════════════════════════════════════════════════════
+//  SECURITY UTILITIES
+// ══════════════════════════════════════════════════════════
+const Security = {
+    // Escape HTML to prevent XSS
+    escapeHtml(text) {
+        if (typeof text !== 'string') return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+
+    // CSRF Token management
+    csrf: {
+        getToken() {
+            let token = localStorage.getItem('csrf_token');
+            if (!token) {
+                const array = new Uint8Array(32);
+                crypto.getRandomValues(array);
+                token = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+                localStorage.setItem('csrf_token', token);
+            }
+            return token;
+        }
+    }
+};
+
+// ══════════════════════════════════════════════════════════
+//  FORM VALIDATION
+// ══════════════════════════════════════════════════════════
+const FormValidator = {
+    validateEmail(input) {
+        const value = input.value.trim();
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        this.showFieldError(input, isValid, 'Please enter a valid email address');
+        return isValid || value === '';
+    },
+
+    validatePhone(input) {
+        const value = input.value.trim();
+        const isValid = /^[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[0-9]{1,14}$/.test(value);
+        this.showFieldError(input, isValid, 'Please enter a valid phone number');
+        return isValid || value === '';
+    },
+
+    validatePin(input) {
+        const value = input.value.trim();
+        const isValid = /^[1-9][0-9]{5}$/.test(value);
+        this.showFieldError(input, isValid, 'Please enter a valid 6-digit PIN code');
+        return isValid || value === '';
+    },
+
+    showFieldError(input, isValid, message) {
+        const parent = input.parentElement;
+        let errorEl = parent.querySelector('.field-error');
+        
+        if (!isValid && input.value.trim() !== '') {
+            input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            input.classList.remove('border-gray-300', 'dark:border-gray-600');
+            
+            if (!errorEl) {
+                errorEl = document.createElement('p');
+                errorEl.className = 'field-error text-red-500 text-xs mt-1';
+                parent.appendChild(errorEl);
+            }
+            errorEl.textContent = message;
+        } else {
+            input.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            input.classList.add('border-gray-300', 'dark:border-gray-600');
+            if (errorEl) errorEl.remove();
+        }
+    },
+
+    initValidation() {
+        const paymentForm = document.getElementById('payment-form');
+        if (!paymentForm) return;
+
+        // Email validation
+        const emailInput = paymentForm.querySelector('input[type="email"]');
+        if (emailInput) {
+            emailInput.addEventListener('blur', () => this.validateEmail(emailInput));
+            emailInput.addEventListener('input', () => {
+                if (emailInput.value.trim() === '') {
+                    const errorEl = emailInput.parentElement.querySelector('.field-error');
+                    if (errorEl) errorEl.remove();
+                    emailInput.classList.remove('border-red-500', 'focus:border-red-500');
+                }
+            });
+        }
+
+        // Phone validation
+        const phoneInputs = paymentForm.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach(input => {
+            input.addEventListener('blur', () => this.validatePhone(input));
+            input.addEventListener('input', () => {
+                if (input.value.trim() === '') {
+                    const errorEl = input.parentElement.querySelector('.field-error');
+                    if (errorEl) errorEl.remove();
+                    input.classList.remove('border-red-500', 'focus:border-red-500');
+                }
+            });
+        });
+
+        // PIN validation
+        const pinInputs = Array.from(paymentForm.querySelectorAll('input')).filter(
+            input => input.placeholder && input.placeholder.includes('PIN')
+        );
+        pinInputs.forEach(input => {
+            input.addEventListener('blur', () => this.validatePin(input));
+            input.addEventListener('input', () => {
+                if (input.value.trim() === '') {
+                    const errorEl = input.parentElement.querySelector('.field-error');
+                    if (errorEl) errorEl.remove();
+                    input.classList.remove('border-red-500', 'focus:border-red-500');
+                }
+            });
+        });
+    }
+};
+
+// ══════════════════════════════════════════════════════════
+//  CART ENGINE  (localStorage-backed with error handling)
 // ══════════════════════════════════════════════════════════
 const Cart = {
     _key: 'adiguru_cart',
 
     get() {
-        try { return JSON.parse(localStorage.getItem(this._key)) || []; }
-        catch { return []; }
+        try { 
+            return JSON.parse(localStorage.getItem(this._key)) || []; 
+        } catch (e) {
+            console.warn('localStorage not available, using session cart');
+            return window.sessionCart || [];
+        }
     },
 
     save(items) {
-        localStorage.setItem(this._key, JSON.stringify(items));
+        try {
+            localStorage.setItem(this._key, JSON.stringify(items));
+        } catch (e) {
+            window.sessionCart = items;
+            console.warn('Saving to session instead of localStorage');
+        }
     },
 
     add(product) {
@@ -55,6 +195,13 @@ const Cart = {
 
     count() {
         return this.get().reduce((s, i) => s + i.qty, 0);
+    },
+
+    formatPrice(amount) {
+        return new Intl.NumberFormat(CONFIG.locale, {
+            style: 'currency',
+            currency: CONFIG.currencyCode
+        }).format(amount);
     }
 };
 
@@ -79,9 +226,13 @@ const CartUI = {
         this.list     = document.getElementById('cart-list');
         this.totalEl  = document.getElementById('cart-total');
 
-        // Cart icon button
+        // Cart icon button with accessibility
         const cartBtn = document.getElementById('cart-btn');
-        if (cartBtn) cartBtn.addEventListener('click', () => this.toggle());
+        if (cartBtn) {
+            cartBtn.addEventListener('click', () => this.toggle());
+            // Update aria-expanded when cart state changes
+            cartBtn.setAttribute('aria-expanded', 'false');
+        }
 
         // Overlay click closes cart
         if (this.overlay) this.overlay.addEventListener('click', () => this.close());
@@ -96,7 +247,29 @@ const CartUI = {
             window.location.href = 'checkout.html';
         });
 
+        // Swipe to close on mobile (touch gesture support)
+        this.initSwipeGesture();
+
         this.refresh();
+    },
+
+    initSwipeGesture() {
+        if (!this.drawer) return;
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        this.drawer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        this.drawer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            // Swipe left to close (finger moves from right to left)
+            if (touchStartX - touchEndX > 50) {
+                this.close();
+            }
+        }, { passive: true });
     },
 
     toggle() {
@@ -109,6 +282,10 @@ const CartUI = {
         this.drawer.classList.add('translate-x-0');
         if (this.overlay) this.overlay.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // Update aria-expanded on cart button
+        const cartBtn = document.getElementById('cart-btn');
+        if (cartBtn) cartBtn.setAttribute('aria-expanded', 'true');
     },
 
     close() {
@@ -117,6 +294,10 @@ const CartUI = {
         this.drawer.classList.remove('translate-x-0');
         if (this.overlay) this.overlay.classList.add('hidden');
         document.body.style.overflow = '';
+        
+        // Update aria-expanded on cart button
+        const cartBtn = document.getElementById('cart-btn');
+        if (cartBtn) cartBtn.setAttribute('aria-expanded', 'false');
     },
 
     bump() {
@@ -147,30 +328,27 @@ const CartUI = {
             this.list.classList.remove('hidden');
         }
 
-        // Render items
-        this.list.innerHTML = items.map(item => `
-            <div class="flex items-start gap-3 py-4 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-earth/10 to-gold/10 flex items-center justify-center shrink-0">
-                    <i class="${item.icon || 'fas fa-leaf'} text-xl text-earth/50"></i>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug truncate">${item.name}</p>
-                    <p class="text-xs text-gold font-bold mt-0.5">₹${item.price.toFixed(2)}</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <button onclick="Cart.updateQty('${item.id}', -1)"
-                            class="w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:border-earth hover:text-earth transition text-sm font-bold">−</button>
-                        <span class="text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">${item.qty}</span>
-                        <button onclick="Cart.updateQty('${item.id}', 1)"
-                            class="w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:border-earth hover:text-earth transition text-sm font-bold">+</button>
-                        <button onclick="Cart.remove('${item.id}')"
-                            class="ml-auto text-gray-300 dark:text-gray-600 hover:text-red-400 transition">
-                            <i class="fas fa-trash-alt text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-                <p class="text-sm font-bold text-gray-700 dark:text-gray-300 shrink-0">₹${(item.price * item.qty).toFixed(2)}</p>
-            </div>
-        `).join('');
+        // Render items with XSS-safe escaping using DocumentFragment
+        const fragment = document.createDocumentFragment();
+        this.list.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'flex items-start gap-3 py-4 border-b border-gray-100 dark:border-gray-800 last:border-0';
+            const iconClass = Security.escapeHtml(item.icon || 'fas fa-leaf');
+            const safeName = Security.escapeHtml(item.name);
+            const safeId = Security.escapeHtml(item.id);
+            div.innerHTML = '<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-earth/10 to-gold/10 flex items-center justify-center shrink-0"><i class="'+iconClass+' text-xl text-earth/50"></i></div><div class="flex-grow min-w-0"><p class="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug truncate" title="'+safeName+'">'+safeName+'</p><p class="text-xs text-gold font-bold mt-0.5">₹'+item.price.toFixed(2)+'</p><div class="flex items-center gap-2 mt-2"><button data-action="decrease" data-id="'+safeId+'" class="qty-btn w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:border-earth hover:text-earth transition text-sm font-bold" aria-label="Decrease quantity">−</button><span class="text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">'+item.qty+'</span><button data-action="increase" data-id="'+safeId+'" class="qty-btn w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:border-earth hover:text-earth transition text-sm font-bold" aria-label="Increase quantity">+</button><button data-action="remove" data-id="'+safeId+'" class="ml-auto text-gray-300 dark:text-gray-600 hover:text-red-400 transition" aria-label="Remove item"><i class="fas fa-trash-alt text-xs"></i></button></div></div><p class="text-sm font-bold text-gray-700 dark:text-gray-300 shrink-0">₹'+(item.price*item.qty).toFixed(2)+'</p>';
+            div.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action, id = btn.dataset.id;
+                    if (action === 'decrease') Cart.updateQty(id, -1);
+                    if (action === 'increase') Cart.updateQty(id, 1);
+                    if (action === 'remove') Cart.remove(id);
+                });
+            });
+            fragment.appendChild(div);
+        });
+        this.list.appendChild(fragment);
 
         // Total
         if (this.totalEl) this.totalEl.textContent = `₹${total.toFixed(2)}`;

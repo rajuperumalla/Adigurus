@@ -8,7 +8,7 @@
     <!-- Preconnect for faster Font Awesome loading -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'" media="print" onload="this.media='all'">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -177,21 +177,34 @@
                         </button>
                     </div>
                     <!-- Theme toggle -->
-                    <button id="theme-toggle" class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <i class="fas fa-moon"></i>
+                    <button id="theme-toggle" 
+                            class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                            aria-label="Toggle dark mode"
+                            aria-pressed="false">
+                        <i class="fas fa-moon" aria-hidden="true"></i>
                     </button>
                     <!-- Cart -->
-                    <button id="cart-btn" class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative">
-                        <i class="fas fa-shopping-cart"></i>
+                    <button id="cart-btn" 
+                            class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+                            aria-label="Shopping cart"
+                            aria-haspopup="dialog"
+                            aria-expanded="false">
+                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                         <span id="cart-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-earth text-white text-[9px] rounded-full flex items-center justify-center font-bold transition-transform duration-200">0</span>
                     </button>
                     <!-- User -->
-                    <a href="dashboard.html" class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <i class="far fa-user-circle"></i>
+                    <a href="dashboard.html" 
+                       class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-earth dark:hover:text-gold transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                       aria-label="My account">
+                        <i class="far fa-user-circle" aria-hidden="true"></i>
                     </a>
                     <!-- Hamburger (mobile only) -->
-                    <button id="mobile-menu-btn" class="md:hidden w-9 h-9 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-earth transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <i class="fas fa-bars text-xl"></i>
+                    <button id="mobile-menu-btn" 
+                            class="md:hidden w-9 h-9 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-earth transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                            aria-label="Open menu"
+                            aria-expanded="false"
+                            aria-controls="mobile-menu">
+                        <i class="fas fa-bars text-xl" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
