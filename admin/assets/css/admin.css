@@ -1,0 +1,289 @@
+/* Admin Dashboard Custom Styles */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4A6741;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3D5636;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Card hover effects */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Table row hover */
+.table-row {
+    transition: background-color 0.2s ease;
+}
+
+/* Badge animations */
+.badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Modal transitions */
+.modal {
+    transition: opacity 0.3s ease;
+}
+
+.modal > div {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+/* Form input focus effects */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #4A6741;
+}
+
+/* Sidebar navigation active state */
+.nav-item.active {
+    background: rgba(74, 103, 65, 0.15);
+    border-left: 3px solid #D4AF37;
+}
+
+/* Stat card icon gradient */
+.stat-icon {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+/* Chart container responsive */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Notification dropdown animation */
+#notificationDropdown {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile menu overlay */
+@media (max-width: 768px) {
+    .sidebar.open ~ .main-content {
+        filter: blur(2px);
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar, header, button, .no-print {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Dark mode transitions */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    padding: 0.5rem 0.75rem;
+    background: #1f2937;
+    color: #fff;
+    font-size: 0.75rem;
+    border-radius: 0.375rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+/* Skeleton loading */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.5rem;
+}
+
+html.dark .skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Status indicator dots */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.pending { background: #F59E0B; }
+.status-dot.shipped { background: #3B82F6; }
+.status-dot.delivered { background: #10B981; }
+.status-dot.cancelled { background: #DC2626; }
+
+/* Progress bar */
+.progress-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+html.dark .progress-bar {
+    background: #4b5563;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4A6741 0%, #3D5636 100%);
+    border-radius: 9999px;
+    transition: width 0.5s ease;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+html.dark .empty-state i {
+    color: #4b5563;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.875rem;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+    }
+}
+
+/* Safe area for notched devices */
+@supports (padding: max(0px)) {
+    .safe-area-top {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    
+    .safe-area-bottom {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+}
