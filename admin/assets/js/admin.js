@@ -351,9 +351,22 @@ const UI = {
         });
 
         // Notification dropdown
-        document.getElementById('notificationBtn')?.addEventListener('click', () => {
-            document.getElementById('notificationDropdown').classList.toggle('hidden');
-        });
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        
+        if (notificationBtn && notificationDropdown) {
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+        }
 
         // Product form
         document.getElementById('productForm')?.addEventListener('submit', async (e) => {
@@ -744,7 +757,13 @@ const UI = {
         const order = state.orders.find(o => o.id === orderId);
         if (!order) return;
 
+        this.showOrderDetails(order);
+    },
+
+    showOrderDetails(order) {
         const content = document.getElementById('orderDetailsContent');
+        if (!content) return;
+        
         content.innerHTML = `
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1092,8 +1111,9 @@ const UI = {
         }
     },
 
-    async loadAnalytics() {
-        const analytics = await API.getAnalytics('weekly');
+    async loadAnalytics(period = 'weekly') {
+        this.currentAnalyticsPeriod = period;
+        const analytics = await API.getAnalytics(period);
 
         const html = `
             <div class="space-y-6">
@@ -1101,10 +1121,10 @@ const UI = {
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-bold text-gray-800 dark:text-white">Sales Analytics</h3>
-                        <div class="flex gap-2">
-                            <button onclick="Admin.switchAnalyticsPeriod('daily')" class="px-4 py-2 rounded-lg text-sm font-medium bg-[#4A6741] text-white">Daily</button>
-                            <button onclick="Admin.switchAnalyticsPeriod('weekly')" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Weekly</button>
-                            <button onclick="Admin.switchAnalyticsPeriod('monthly')" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">Monthly</button>
+                        <div class="flex gap-2" id="periodSelector">
+                            <button onclick="Admin.switchAnalyticsPeriod('daily')" class="period-btn px-4 py-2 rounded-lg text-sm font-medium transition ${period === 'daily' ? 'bg-[#4A6741] text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">Daily</button>
+                            <button onclick="Admin.switchAnalyticsPeriod('weekly')" class="period-btn px-4 py-2 rounded-lg text-sm font-medium transition ${period === 'weekly' ? 'bg-[#4A6741] text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">Weekly</button>
+                            <button onclick="Admin.switchAnalyticsPeriod('monthly')" class="period-btn px-4 py-2 rounded-lg text-sm font-medium transition ${period === 'monthly' ? 'bg-[#4A6741] text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}">Monthly</button>
                         </div>
                     </div>
 
@@ -1166,13 +1186,21 @@ const UI = {
     },
 
     initAnalyticsCharts(analytics) {
+        // Destroy existing charts if they exist
+        if (this.revenueChartInstance) {
+            this.revenueChartInstance.destroy();
+        }
+        if (this.ordersChartInstance) {
+            this.ordersChartInstance.destroy();
+        }
+
         const data = analytics[analytics.currentPeriod] || analytics.weekly;
 
         const revenueCtx = document.getElementById('revenueChart');
         const ordersCtx = document.getElementById('ordersChart');
 
         if (revenueCtx) {
-            new Chart(revenueCtx, {
+            this.revenueChartInstance = new Chart(revenueCtx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => d.date || d.week || d.month),
@@ -1188,13 +1216,21 @@ const UI = {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '₹' + value.toLocaleString('en-IN')
+                            }
+                        }
+                    }
                 }
             });
         }
 
         if (ordersCtx) {
-            new Chart(ordersCtx, {
+            this.ordersChartInstance = new Chart(ordersCtx, {
                 type: 'bar',
                 data: {
                     labels: data.map(d => d.date || d.week || d.month),
@@ -1208,7 +1244,12 @@ const UI = {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
         }
@@ -1216,7 +1257,7 @@ const UI = {
 
     switchAnalyticsPeriod(period) {
         // Reload analytics with new period
-        this.loadAnalytics();
+        this.loadAnalytics(period);
     },
 
     renderSettings() {
@@ -1307,7 +1348,7 @@ const UI = {
             }
 
             list.innerHTML = state.notifications.map(notif => `
-                <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="viewOrderFromNotification(${notif.id})">
                     <div class="flex items-start gap-3">
                         <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-shopping-bag text-blue-500"></i>
@@ -1338,7 +1379,12 @@ const UI = {
 // GLOBAL FUNCTIONS (for HTML onclick handlers)
 // ============================================
 
-window.Admin = UI;
+window.Admin = {
+    ...UI,
+    currentAnalyticsPeriod: 'weekly',
+    revenueChartInstance: null,
+    ordersChartInstance: null
+};
 
 function closeProductModal() {
     document.getElementById('productModal').classList.remove('active');
@@ -1350,6 +1396,19 @@ function closeDiscountModal() {
 
 function closeOrderModal() {
     document.getElementById('orderModal').classList.remove('active');
+}
+
+// View order from notification click
+function viewOrderFromNotification(orderId) {
+    const order = state.orders.find(o => o.id === orderId);
+    if (order) {
+        UI.showOrderDetails(order);
+        // Close notification dropdown
+        const dropdown = document.getElementById('notificationDropdown');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    }
 }
 
 // ============================================
