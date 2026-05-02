@@ -1,0 +1,15 @@
+{
+  "notificationEmail": "",
+  "emailService": "gmail",
+  "emailUser": "",
+  "emailPass": "",
+  "whatsappNumber": "",
+  "twilioSid": "",
+  "twilioToken": "",
+  "twilioFrom": "whatsapp:+14155238886",
+  "telegramBotToken": "",
+  "telegramChatId": "",
+  "slackWebhookUrl": "",
+  "customerEmailEnabled": false,
+  "customerWhatsAppEnabled": false
+}

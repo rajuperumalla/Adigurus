@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1011,
+    "customer": "sai kiran",
+    "email": "rajuperumalla007@gmail.com",
+    "phone": "9182799751",
+    "address": "secudnrabadb, hyderabad, telangana, 500039",
+    "items": 1,
+    "itemDetails": [
+      {
+        "name": "Bhringraj Growth Serum",
+        "price": 320,
+        "qty": 2
+      }
+    ],
+    "subtotal": 640,
+    "shipping": 0,
+    "total": 640,
+    "paymentMethod": "cod",
+    "date": "2026-05-02T09:21:08.751Z",
+    "status": "pending"
+  },
+  {
+    "id": 1010,
+    "customer": "raju per",
+    "email": "raju@gmail.com",
+    "phone": "9283736364",
+    "address": "beerapppa gadda , uppal, hyd, telengana, 500039",
+    "items": 1,
+    "itemDetails": [
+      {
+        "name": "Medicated Hair Oil",
+        "price": 250,
+        "qty": 1
+      }
+    ],
+    "subtotal": 250,
+    "shipping": 50,
+    "total": 300,
+    "paymentMethod": "cod",
+    "date": "2026-05-02T07:55:19.147Z",
+    "status": "pending"
+  },
+  {
+    "id": 1009,
+    "customer": "rahul ramakrishna",
+    "email": "rajuperumalal@gmail.com",
+    "phone": "928283837",
+    "address": "uppal, beerapapagaa, hyde, telangana, 500038",
+    "items": 1,
+    "itemDetails": [
+      {
+        "name": "Medicated Hair Oil (2 Pack)",
+        "price": 250,
+        "qty": 2
+      }
+    ],
+    "subtotal": 500,
+    "shipping": 0,
+    "total": 500,
+    "paymentMethod": "cod",
+    "date": "2026-05-01T13:26:12.127Z",
+    "status": "pending"
+  },
+  {
+    "id": 1008,
+    "customer": "Deepika Iyer",
+    "email": "deepika@email.com",
+    "phone": "+91 9876543217",
+    "total": 1890,
+    "status": "delivered",
+    "items": 4,
+    "itemDetails": [
+      {
+        "name": "Kumkumadi Tailam",
+        "price": 580,
+        "qty": 1
+      },
+      {
+        "name": "Neem Face Wash",
+        "price": 220,
+        "qty": 2
+      },
+      {
+        "name": "Ashwagandha Capsules",
+        "price": 450,
+        "qty": 1
+      }
+    ],
+    "address": "67 Anna Nagar, Chennai, Tamil Nadu, 600040",
+    "paymentMethod": "upi",
+    "date": "2025-01-11T15:45:00.000Z"
+  },
+  {
+    "id": 1007,
+    "customer": "Rahul Verma",
+    "email": "rahul@email.com",
+    "phone": "+91 9876543216",
+    "total": 780,
+    "status": "pending",
+    "items": 2,
+    "itemDetails": [
+      {
+        "name": "Pain Relief Balm",
+        "price": 180,
+        "qty": 2
+      },
+      {
+        "name": "Joint Care Oil",
+        "price": 290,
+        "qty": 1
+      }
+    ],
+    "address": "34 Hazratganj, Lucknow, Uttar Pradesh, 226001",
+    "paymentMethod": "cod",
+    "date": "2025-01-15T13:20:00.000Z"
+  },
+  {
+    "id": 1006,
+    "customer": "Ananya Das",
+    "email": "ananya@email.com",
+    "phone": "+91 9876543215",
+    "total": 1450,
+    "status": "shipped",
+    "items": 3,
+    "itemDetails": [
+      {
+        "name": "Medicated Hair Oil",
+        "price": 250,
+        "qty": 2
+      },
+      {
+        "name": "Triphala Churna",
+        "price": 320,
+        "qty": 1
+      },
+      {
+        "name": "Pain Relief Balm",
+        "price": 180,
+        "qty": 1
+      }
+    ],
+    "address": "89 Salt Lake, Kolkata, West Bengal, 700091",
+    "paymentMethod": "card",
+    "date": "2025-01-14T08:30:00.000Z"
+  },
+  {
+    "id": 1005,
+    "customer": "Vikram Singh",
+    "email": "vikram@email.com",
+    "phone": "+91 9876543214",
+    "total": 3200,
+    "status": "cancelled",
+    "items": 4,
+    "itemDetails": [
+      {
+        "name": "Brahmi Ghee",
+        "price": 520,
+        "qty": 2
+      },
+      {
+        "name": "Ashwagandha Capsules",
+        "price": 450,
+        "qty": 2
+      },
+      {
+        "name": "Kumkumadi Tailam",
+        "price": 580,
+        "qty": 1
+      }
+    ],
+    "address": "56 Civil Lines, Delhi, Delhi, 110054",
+    "paymentMethod": "upi",
+    "date": "2025-01-12T11:00:00.000Z"
+  },
+  {
+    "id": 1004,
+    "customer": "Sneha Reddy",
+    "email": "sneha@email.com",
+    "phone": "+91 9876543213",
+    "total": 650,
+    "status": "pending",
+    "items": 1,
+    "itemDetails": [
+      {
+        "name": "Ashwagandha Capsules",
+        "price": 450,
+        "qty": 1
+      },
+      {
+        "name": "Triphala Churna",
+        "price": 320,
+        "qty": 1
+      }
+    ],
+    "address": "12 Banjara Hills, Hyderabad, Telangana, 500034",
+    "paymentMethod": "upi",
+    "date": "2025-01-15T16:45:00.000Z"
+  },
+  {
+    "id": 1003,
+    "customer": "Amit Patel",
+    "email": "amit@email.com",
+    "phone": "+91 9876543212",
+    "total": 2100,
+    "status": "delivered",
+    "items": 5,
+    "itemDetails": [
+      {
+        "name": "Medicated Hair Oil",
+        "price": 250,
+        "qty": 3
+      },
+      {
+        "name": "Neem Face Wash",
+        "price": 220,
+        "qty": 2
+      },
+      {
+        "name": "Joint Care Oil",
+        "price": 290,
+        "qty": 1
+      }
+    ],
+    "address": "78 CG Road, Ahmedabad, Gujarat, 380009",
+    "paymentMethod": "card",
+    "date": "2025-01-13T09:15:00.000Z"
+  },
+  {
+    "id": 1002,
+    "customer": "Priya Sharma",
+    "email": "priya@email.com",
+    "phone": "+91 9876543211",
+    "total": 890,
+    "status": "shipped",
+    "items": 2,
+    "itemDetails": [
+      {
+        "name": "Kumkumadi Tailam",
+        "price": 580,
+        "qty": 1
+      },
+      {
+        "name": "Neem Face Wash",
+        "price": 220,
+        "qty": 1
+      }
+    ],
+    "address": "45 Park Street, Kolkata, West Bengal, 700016",
+    "paymentMethod": "upi",
+    "date": "2025-01-14T14:20:00.000Z"
+  },
+  {
+    "id": 1001,
+    "customer": "Rajesh Kumar",
+    "email": "rajesh@email.com",
+    "phone": "+91 9876543210",
+    "total": 1250,
+    "status": "pending",
+    "items": 3,
+    "itemDetails": [
+      {
+        "name": "Medicated Hair Oil",
+        "price": 250,
+        "qty": 2
+      },
+      {
+        "name": "Pain Relief Balm",
+        "price": 180,
+        "qty": 1
+      },
+      {
+        "name": "Brahmi Ghee",
+        "price": 520,
+        "qty": 1
+      }
+    ],
+    "address": "123 MG Road, Bangalore, Karnataka, 560001",
+    "paymentMethod": "card",
+    "date": "2025-01-15T10:30:00.000Z"
+  }
+]

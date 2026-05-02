@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Adiguru's</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Admin Styles -->
+    <link rel="stylesheet" href="assets/css/admin.css">
+    
+    <style>
+        :root {
+            --primary: #4A6741;
+            --primary-dark: #3D5636;
+            --secondary: #D4AF37;
+            --danger: #DC2626;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f3f4f6;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, #1a2420 0%, #0d1210 100%);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(74, 103, 65, 0.2);
+            border-left: 3px solid #D4AF37;
+        }
+        
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4A6741 0%, #3D5636 100%);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3D5636 0%, #2f4229 100%);
+        }
+        
+        .table-row:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-shipped { background: #DBEAFE; color: #1E40AF; }
+        .badge-delivered { background: #D1FAE5; color: #065F46; }
+        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            margin: -12px 0 0 -12px;
+            border: 3px solid #fff;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                height: 100vh;
+                z-index: 999;
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal active">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div class="bg-gradient-to-r from-[#4A6741] to-[#3D5636] p-8 text-center">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Admin Login</h2>
+                <p class="text-white/80 text-sm">Access your dashboard securely</p>
+            </div>
+            
+            <form id="loginForm" class="p-8 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Email Address
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" id="loginEmail" required 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                               placeholder="admin@adigurus.com">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-key"></i>
+                        </span>
+                        <input type="password" id="loginPassword" required 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                               placeholder="••••••••">
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="w-4 h-4 text-[#4A6741] rounded focus:ring-[#4A6741]">
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-[#4A6741] hover:underline">Forgot password?</a>
+                </div>
+                
+                <button type="submit" id="loginBtn" class="w-full btn-primary text-white font-semibold py-3 rounded-lg hover:shadow-lg transition duration-300">
+                    Sign In
+                </button>
+                
+                <div id="loginError" class="hidden bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm text-center py-3 rounded-lg"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden until logged in) -->
+    <div id="dashboard" class="hidden">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-64 min-h-screen fixed left-0 top-0 text-white">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#B89628] rounded-lg flex items-center justify-center">
+                        <i class="fas fa-leaf text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg">Adiguru's</h1>
+                        <p class="text-xs text-white/60">Admin Panel</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="mt-6 px-3">
+                <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="dashboard">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="orders">
+                    <i class="fas fa-shopping-bag w-5"></i>
+                    <span>Orders</span>
+                    <span id="pendingBadge" class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="products">
+                    <i class="fas fa-box w-5"></i>
+                    <span>Products</span>
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="discounts">
+                    <i class="fas fa-tag w-5"></i>
+                    <span>Discounts</span>
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="analytics">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span>Analytics</span>
+                </a>
+                
+                <div class="border-t border-white/10 my-4"></div>
+                
+                <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1" data-page="settings">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" id="logoutBtn" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/20">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <p id="adminName" class="text-sm font-semibold">Admin User</p>
+                        <p class="text-xs text-white/60">Super Admin</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content ml-64 min-h-screen">
+            
+            <!-- Top Bar -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <button id="mobileMenuBtn" class="md:hidden text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 id="pageTitle" class="text-xl font-bold text-gray-800 dark:text-white">Dashboard Overview</h2>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <!-- Notifications -->
+                        <div class="relative">
+                            <button id="notificationBtn" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center relative">
+                                <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
+                                <span id="notificationBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center hidden">0</span>
+                            </button>
+                            
+                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+                                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                    <h3 class="font-semibold text-gray-800 dark:text-white">Notifications</h3>
+                                </div>
+                                <div id="notificationList">
+                                    <!-- Notifications will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Theme Toggle -->
+                        <button id="themeToggle" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                            <i class="fas fa-moon text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div id="pageContent" class="p-6">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal" style="padding:12px;">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-auto flex flex-col" style="max-height:92vh;">
+            <!-- Sticky header — close button always visible -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl" style="position:sticky;top:0;z-index:20;flex-shrink:0;">
+                <h3 id="productModalTitle" class="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h3>
+                <button onclick="closeProductModal()"
+                    style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                           background:#f3f4f6;border:none;cursor:pointer;flex-shrink:0;transition:background .15s;"
+                    onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'"
+                    aria-label="Close modal">
+                    <i class="fas fa-times" style="font-size:16px;color:#374151;"></i>
+                </button>
+            </div>
+            <!-- Scrollable body -->
+            <div style="overflow-y:auto;flex:1;">
+            
+            <form id="productForm" class="p-6 space-y-6">
+                <input type="hidden" id="editProductId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Name *</label>
+                        <input type="text" id="productName" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category *</label>
+                        <select id="productCategory" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                            <option value="">Select Category</option>
+                            <option value="Hair Care">Hair Care</option>
+                            <option value="Pain Relief">Pain Relief</option>
+                            <option value="Skin Care">Skin Care</option>
+                            <option value="Wellness">Wellness</option>
+                            <option value="Supplements">Supplements</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description *</label>
+                    <textarea id="productDescription" required rows="3" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white"></textarea>
+                </div>
+
+                <!-- Banner Label -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-tag text-[#D4AF37] mr-1"></i> Product Banner Label
+                        <span class="text-xs text-gray-400 font-normal ml-1">(shown top-left on product card)</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <select id="productBadgePreset" onchange="handleBadgePreset(this.value)"
+                            class="w-44 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white text-sm">
+                            <option value="">— No Label —</option>
+                            <option value="Recently Added">Recently Added</option>
+                            <option value="New Product">New Product</option>
+                            <option value="Hot Sale">Hot Sale</option>
+                            <option value="Best Seller">Best Seller</option>
+                            <option value="30% Discount">30% Discount</option>
+                            <option value="Limited Stock">Limited Stock</option>
+                            <option value="__custom__">Custom…</option>
+                        </select>
+                        <input type="text" id="productBadge" maxlength="20" placeholder="Label text (leave blank for none)"
+                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white text-sm">
+                    </div>
+                    <!-- Live preview -->
+                    <div id="badgePreview" class="hidden mt-2 flex items-center gap-2">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Preview:</span>
+                        <span id="badgePreviewChip" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price (₹) *</label>
+                        <input type="number" id="productPrice" required step="0.01" min="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stock *</label>
+                        <input type="number" id="productStock" required min="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount (%)</label>
+                        <input type="number" id="productDiscount" min="0" max="100" value="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</label>
+                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                        <input type="file" id="productImage" accept="image/*" class="hidden">
+                        <label for="productImage" class="cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Click to upload or drag and drop</p>
+                            <p class="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                        </label>
+                        <img id="imagePreview" class="mt-4 max-h-48 mx-auto rounded-lg hidden">
+                    </div>
+                </div>
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="closeProductModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="submit" id="saveProductBtn" class="flex-1 btn-primary text-white font-semibold py-3 rounded-lg hover:shadow-lg transition">Save Product</button>
+                </div>
+            </form>
+            </div><!-- end scrollable body -->
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div id="discountModal" class="modal">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Create Discount</h3>
+                <button onclick="closeDiscountModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="discountForm" class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Offer Name *</label>
+                    <input type="text" id="discountName" required placeholder="e.g., Diwali Sale 2025" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount Type *</label>
+                        <select id="discountType" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (₹)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount Value *</label>
+                        <input type="number" id="discountValue" required step="0.01" min="0" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Apply To *</label>
+                    <select id="discountScope" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                        <option value="store">Entire Store</option>
+                        <option value="category">Specific Category</option>
+                        <option value="product">Specific Product</option>
+                    </select>
+                </div>
+                
+                <div id="discountTargetContainer" class="hidden">
+                    <select id="discountTarget" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                        <!-- Options populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date *</label>
+                        <input type="date" id="discountStart" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date *</label>
+                        <input type="date" id="discountEnd" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4A6741] dark:bg-gray-700 dark:text-white">
+                    </div>
+                </div>
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="closeDiscountModal()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="submit" class="flex-1 btn-primary text-white font-semibold py-3 rounded-lg hover:shadow-lg transition">Create Offer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="modal">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Order Details</h3>
+                <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="orderDetailsContent" class="p-6">
+                <!-- Order details loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin JavaScript -->
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

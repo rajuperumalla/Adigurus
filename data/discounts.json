@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Diwali Dhamaka",
+    "code": "DIWALI25",
+    "type": "percentage",
+    "value": 25,
+    "scope": "store",
+    "startDate": "2024-11-01",
+    "endDate": "2024-11-15",
+    "active": false,
+    "createdAt": "2024-10-25T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "New Year Sale",
+    "code": "NEWYEAR20",
+    "type": "percentage",
+    "value": 20,
+    "scope": "category",
+    "target": "Hair Care",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "active": true,
+    "createdAt": "2024-12-20T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Flash Offer",
+    "code": "FLASH50",
+    "type": "fixed",
+    "value": 50,
+    "scope": "store",
+    "startDate": "2025-01-10",
+    "endDate": "2025-12-31",
+    "active": true,
+    "createdAt": "2025-01-10T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Spring Special",
+    "code": "SPRING20",
+    "type": "percentage",
+    "value": 20,
+    "scope": "store",
+    "startDate": "2025-03-01",
+    "endDate": "2025-03-31",
+    "active": false,
+    "createdAt": "2025-02-15T00:00:00.000Z"
+  },
+  {
+    "id": 1777711083056,
+    "name": "Christmas Sales",
+    "type": "percentage",
+    "value": 20,
+    "scope": "category",
+    "startDate": "2026-05-02",
+    "endDate": "2026-06-01",
+    "active": true,
+    "target": "Hair Care",
+    "createdAt": "2026-05-02T08:38:03.056Z"
+  },
+  {
+    "id": 1777714038633,
+    "name": "Diwali offer ",
+    "type": "percentage",
+    "value": 30,
+    "scope": "store",
+    "startDate": "2026-05-02",
+    "endDate": "2026-06-01",
+    "active": true,
+    "createdAt": "2026-05-02T09:27:18.633Z"
+  }
+]

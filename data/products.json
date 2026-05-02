@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "name": "Medicated Hair Oil",
+    "category": "Hair Care",
+    "price": 250,
+    "stock": 150,
+    "discount": 10,
+    "badge": "Best Seller",
+    "image": "",
+    "description": "Traditional Ayurvedic hair oil with bhringraj and amla",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Pain Relief Balm",
+    "category": "Pain Relief",
+    "price": 180,
+    "stock": 200,
+    "discount": 0,
+    "badge": "Hot Sale",
+    "image": "",
+    "description": "Fast-acting pain relief balm with wintergreen oil",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Neem Face Wash",
+    "category": "Skin Care",
+    "price": 220,
+    "stock": 120,
+    "discount": 15,
+    "badge": "30% Discount",
+    "image": "",
+    "description": "Natural neem-based face wash for clear skin",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Ashwagandha Capsules",
+    "category": "Wellness",
+    "price": 450,
+    "stock": 80,
+    "discount": 0,
+    "badge": "Recently Added",
+    "image": "",
+    "description": "Pure ashwagandha extract for stress relief",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "name": "Triphala Churna",
+    "category": "Supplements",
+    "price": 320,
+    "stock": 95,
+    "discount": 5,
+    "badge": "",
+    "image": "",
+    "description": "Digestive health supplement with three fruits",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "name": "Kumkumadi Tailam",
+    "category": "Skin Care",
+    "price": 580,
+    "stock": 60,
+    "discount": 0,
+    "badge": "New Product",
+    "image": "",
+    "description": "Premium face oil for glowing skin",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 7,
+    "name": "Joint Care Oil",
+    "category": "Pain Relief",
+    "price": 290,
+    "stock": 110,
+    "discount": 10,
+    "badge": "",
+    "image": "",
+    "description": "Ayurvedic oil for joint pain and stiffness",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 8,
+    "name": "Brahmi Ghee",
+    "category": "Wellness",
+    "price": 520,
+    "stock": 45,
+    "discount": 0,
+    "badge": "Limited Stock",
+    "image": "",
+    "description": "Memory enhancer with brahmi and pure ghee",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
