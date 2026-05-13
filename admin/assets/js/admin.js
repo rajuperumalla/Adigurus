@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Adiguru's Admin Dashboard - FIXED VERSION
  * Production-ready admin panel with authentication, order management, product management, and analytics
  *
@@ -328,6 +328,10 @@ const UI = {
                 if (e.target === modal) modal.classList.remove('active');
             });
         });
+
+        ['productName', 'productCategory', 'productPrice'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', () => this.updateCustomerPreview());
+        });
     },
 
     async checkAuthentication() {
@@ -384,6 +388,10 @@ const UI = {
     },
 
     async navigateTo(page) {
+        if (this._autoRefreshInterval) {
+            clearInterval(this._autoRefreshInterval);
+            this._autoRefreshInterval = null;
+        }
         state.currentPage = page;
 
         document.querySelectorAll('.nav-item[data-page]').forEach(item => {
@@ -414,16 +422,17 @@ const UI = {
 
         switch (page) {
             case 'dashboard': await this.loadDashboard(); break;
-case 'orders':
-    await this.loadOrders();
-    // Auto‑refresh orders every 30 seconds
-    if (this.autoRefreshInterval) clearInterval(this.autoRefreshInterval);
-    this.autoRefreshInterval = setInterval(() => this.loadOrders(), 30000);
-    break;
-case 'products':  await this.loadProducts(); break;
-case 'discounts': await this.loadDiscounts(); break;
-case 'analytics': await this.loadAnalytics(this.currentAnalyticsPeriod); break;
-case 'settings':  await this.renderSettings(); break;
+            case 'orders':
+                await this.loadOrders();
+                this._autoRefreshInterval = setInterval(() => {
+                    if (state.currentPage === 'orders') this.loadOrders();
+                    else { clearInterval(this._autoRefreshInterval); this._autoRefreshInterval = null; }
+                }, 30000);
+                break;
+            case 'products':  await this.loadProducts(); break;
+            case 'discounts': await this.loadDiscounts(); break;
+            case 'analytics': await this.loadAnalytics(this.currentAnalyticsPeriod); break;
+            case 'settings':  await this.renderSettings(); break;
         }
     },
 
@@ -786,7 +795,7 @@ case 'settings':  await this.renderSettings(); break;
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden group flex flex-col">
                             <div class="aspect-square bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 flex items-center justify-center relative overflow-hidden">
                                 ${product.image
-                                    ? `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">`
+                                    ? `<img src="${product.image}" alt="${product.name}" class="w-full h-full" style="object-fit:cover;object-position:${product.imagePosX ?? 50}% ${product.imagePosY ?? 50}%;transform:scale(${(product.imageZoom || 100) / 100})">`
                                     : `<i class="fas fa-box text-6xl text-gray-300 dark:text-gray-600"></i>`}
                                 <!-- Dynamic banner label (top-left) -->
                                 ${product.badge ? `
@@ -891,13 +900,23 @@ case 'settings':  await this.renderSettings(); break;
             if (product.image) {
                 preview.src = product.image;
                 preview.classList.remove('hidden');
+                document.getElementById('imageCropControls').classList.remove('hidden');
+                document.getElementById('imageZoom').value = product.imageZoom || 100;
+                document.getElementById('imagePosX').value = product.imagePosX ?? 50;
+                document.getElementById('imagePosY').value = product.imagePosY ?? 50;
+                this.updateImagePreview();
             }
         } else {
             title.textContent = 'Add New Product';
             document.getElementById('editProductId').value = '';
+            document.getElementById('imageCropControls').classList.add('hidden');
+            document.getElementById('imageZoom').value = 100;
+            document.getElementById('imagePosX').value = 50;
+            document.getElementById('imagePosY').value = 50;
         }
 
         modal.classList.add('active');
+        this.updateCustomerPreview();
     },
 
     previewImage(file) {
@@ -907,8 +926,47 @@ case 'settings':  await this.renderSettings(); break;
             const img = document.getElementById('imagePreview');
             img.src = e.target.result;
             img.classList.remove('hidden');
+            document.getElementById('imageZoom').value = 100;
+            document.getElementById('imagePosX').value = 50;
+            document.getElementById('imagePosY').value = 50;
+            document.getElementById('imageCropControls').classList.remove('hidden');
+            this.updateImagePreview();
         };
         reader.readAsDataURL(file);
+    },
+
+    updateImagePreview() {
+        const zoom = document.getElementById('imageZoom').value;
+        const posX = document.getElementById('imagePosX').value;
+        const posY = document.getElementById('imagePosY').value;
+        document.getElementById('zoomVal').textContent = (zoom / 100).toFixed(1) + 'x';
+        document.getElementById('posXVal').textContent = posX + '%';
+        document.getElementById('posYVal').textContent = posY + '%';
+        const cpImg = document.getElementById('customerPreviewImg');
+        if (cpImg) {
+            const src = document.getElementById('imagePreview').src;
+            if (src) cpImg.src = src;
+            cpImg.style.objectPosition = `${posX}% ${posY}%`;
+            cpImg.style.transform = `scale(${zoom / 100})`;
+        }
+        this.updateCustomerPreview();
+    },
+
+    updateCustomerPreview() {
+        const name = document.getElementById('productName')?.value || 'Product Name';
+        const cat = document.getElementById('productCategory')?.value || 'Category';
+        const price = document.getElementById('productPrice')?.value || '0';
+        const el = (id) => document.getElementById(id);
+        if (el('customerPreviewName')) el('customerPreviewName').textContent = name;
+        if (el('customerPreviewCategory')) el('customerPreviewCategory').textContent = cat;
+        if (el('customerPreviewPrice')) el('customerPreviewPrice').textContent = '₹' + parseFloat(price || 0).toLocaleString('en-IN');
+    },
+
+    resetImagePosition() {
+        document.getElementById('imageZoom').value = 100;
+        document.getElementById('imagePosX').value = 50;
+        document.getElementById('imagePosY').value = 50;
+        this.updateImagePreview();
     },
 
     async handleSaveProduct() {
@@ -924,7 +982,10 @@ case 'settings':  await this.renderSettings(); break;
             price:       parseFloat(document.getElementById('productPrice').value),
             stock:       parseInt(document.getElementById('productStock').value),
             discount:    parseInt(document.getElementById('productDiscount').value) || 0,
-            badge:       (document.getElementById('productBadge')?.value || '').trim()
+            badge:       (document.getElementById('productBadge')?.value || '').trim(),
+            imageZoom:   parseInt(document.getElementById('imageZoom')?.value) || 100,
+            imagePosX:   parseInt(document.getElementById('imagePosX')?.value) ?? 50,
+            imagePosY:   parseInt(document.getElementById('imagePosY')?.value) ?? 50
         };
 
         const imageFile = document.getElementById('productImage').files[0];
