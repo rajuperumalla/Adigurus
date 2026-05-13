@@ -430,16 +430,23 @@ case 'settings':  await this.renderSettings(); break;
     // ---------- DASHBOARD ----------
 
     async loadDashboard() {
-        state.orders   = await API.getOrders();
-        state.products = await API.getProducts();
-        state.discounts = await API.getDiscounts();
+        const [orders, products, discounts, analytics] = await Promise.all([
+            API.getOrders(),
+            API.getProducts(),
+            API.getDiscounts(),
+            API.getAnalytics('daily')
+        ]);
+        state.orders = orders;
+        state.products = products;
+        state.discounts = discounts;
 
         state.stats.totalOrders   = state.orders.length;
-        state.stats.totalRevenue  = state.orders.reduce((sum, o) => sum + o.total, 0);
+        state.stats.totalRevenue  = state.orders.reduce((sum, o) => sum + (o.total || 0), 0);
         state.stats.totalProducts = state.products.length;
         state.stats.pendingOrders = state.orders.filter(o => o.status === 'pending').length;
 
         this.updateNotifications();
+        this._dashboardAnalytics = analytics;
 
         const html = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -526,7 +533,7 @@ case 'settings':  await this.renderSettings(); break;
     },
 
     initDashboardCharts() {
-        const analytics = API.mockAnalytics('daily');
+        const analytics = this._dashboardAnalytics || { daily: [], topProducts: [] };
 
         const salesCtx = document.getElementById('salesChart');
         if (salesCtx) {

@@ -1,18 +1,11 @@
-// api/admin/orders.js — Vercel Serverless Function
-// GET  /api/admin/orders — returns all orders for the admin panel
-// PUT  /api/admin/orders — update order status
-
 const mongoose = require('mongoose');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'adigurus-admin-2025';
 
 let conn = null;
 async function getConnection() {
     if (conn && mongoose.connection.readyState === 1) return conn;
-    conn = await mongoose.connect(MONGODB_URI, {
-        serverApi: { version: '1', strict: true, deprecationErrors: true }
-    });
+    conn = await mongoose.connect(MONGODB_URI);
     return conn;
 }
 
@@ -32,14 +25,29 @@ module.exports = async function handler(req, res) {
     try {
         await getConnection();
 
-        // GET — fetch all orders
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const parts = url.pathname.split('/').filter(Boolean);
+        // ['api','admin','orders'] or ['api','admin','orders','123','status']
+        const orderId = parts[3] ? Number(parts[3]) : null;
+        const action = parts[4] || null;
+
         if (req.method === 'GET') {
             const orders = await Order.find().sort({ id: -1 }).lean();
             return res.status(200).json(orders);
         }
 
-        res.status(405).json({ error: 'Method not allowed' });
+        if (req.method === 'PUT' && orderId && action === 'status') {
+            const { status } = req.body || {};
+            const order = await Order.findOneAndUpdate(
+                { id: orderId },
+                { $set: { status } },
+                { new: true, lean: true }
+            );
+            if (!order) return res.status(404).json({ success: false, error: 'Order not found' });
+            return res.status(200).json({ success: true, order });
+        }
 
+        res.status(405).json({ error: 'Method not allowed' });
     } catch (err) {
         console.error('[api/admin/orders] Error:', err);
         res.status(500).json({ success: false, error: err.message });

@@ -1,6 +1,10 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    { "source": "/api/admin/products/reorder", "destination": "/api/admin/products" },
+    { "source": "/api/admin/products/:id", "destination": "/api/admin/products" },
+    { "source": "/api/admin/orders/:id/status", "destination": "/api/admin/orders" },
+    { "source": "/api/admin/discounts/:id", "destination": "/api/admin/discounts" },
+    { "source": "/api/admin/notifications/test", "destination": "/api/admin/notifications" }
   ]
 }
