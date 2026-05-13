@@ -414,11 +414,16 @@ const UI = {
 
         switch (page) {
             case 'dashboard': await this.loadDashboard(); break;
-            case 'orders':    await this.loadOrders(); break;
-            case 'products':  await this.loadProducts(); break;
-            case 'discounts': await this.loadDiscounts(); break;
-            case 'analytics': await this.loadAnalytics(this.currentAnalyticsPeriod); break;
-            case 'settings':  await this.renderSettings(); break;
+case 'orders':
+    await this.loadOrders();
+    // Auto‑refresh orders every 30 seconds
+    if (this.autoRefreshInterval) clearInterval(this.autoRefreshInterval);
+    this.autoRefreshInterval = setInterval(() => this.loadOrders(), 30000);
+    break;
+case 'products':  await this.loadProducts(); break;
+case 'discounts': await this.loadDiscounts(); break;
+case 'analytics': await this.loadAnalytics(this.currentAnalyticsPeriod); break;
+case 'settings':  await this.renderSettings(); break;
         }
     },
 
