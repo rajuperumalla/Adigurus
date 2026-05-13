@@ -692,76 +692,79 @@ const UI = {
         const content = document.getElementById('orderDetailsContent');
         if (!content) return;
         content.innerHTML = `
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4 sm:space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Order Information</h4>
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Order Information</h4>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 space-y-1.5 text-sm">
                             <p><span class="text-gray-500">Order ID:</span> <span class="font-semibold">#${order.id}</span></p>
                             <p><span class="text-gray-500">Date:</span> ${new Date(order.date).toLocaleString('en-IN')}</p>
                             <p><span class="text-gray-500">Status:</span> ${this.renderStatusBadge(order.status)}</p>
                         </div>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Customer Details</h4>
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Customer Details</h4>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 space-y-1.5 text-sm">
                             <p class="font-semibold">${order.customer}</p>
-                            <p class="text-gray-600 dark:text-gray-400">${order.email}</p>
+                            <p class="text-gray-600 dark:text-gray-400 break-all">${order.email}</p>
                             <p class="text-gray-600 dark:text-gray-400">${order.phone}</p>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Shipping Address</h4>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <p class="text-gray-800 dark:text-white">${order.address}</p>
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Shipping Address</h4>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4">
+                        <p class="text-sm text-gray-800 dark:text-white">${order.address}</p>
                     </div>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Products Ordered</h4>
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Products Ordered</h4>
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
                         ${order.itemDetails && order.itemDetails.length ? `
-                        <table class="w-full text-sm">
+                        <div class="overflow-x-auto">
+                        <table class="w-full text-xs sm:text-sm">
                             <thead class="bg-gray-100 dark:bg-gray-600">
                                 <tr>
-                                    <th class="text-left px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">#</th>
-                                    <th class="text-left px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Product</th>
-                                    <th class="text-center px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Qty</th>
-                                    <th class="text-right px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Price</th>
-                                    <th class="text-right px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Total</th>
+                                    <th class="text-left px-2 sm:px-4 py-2 font-semibold text-gray-600 dark:text-gray-300">#</th>
+                                    <th class="text-left px-2 sm:px-4 py-2 font-semibold text-gray-600 dark:text-gray-300">Product</th>
+                                    <th class="text-center px-2 sm:px-4 py-2 font-semibold text-gray-600 dark:text-gray-300">Qty</th>
+                                    <th class="text-right px-2 sm:px-4 py-2 font-semibold text-gray-600 dark:text-gray-300">Price</th>
+                                    <th class="text-right px-2 sm:px-4 py-2 font-semibold text-gray-600 dark:text-gray-300">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${order.itemDetails.map((item, i) => `
                                 <tr class="border-t border-gray-200 dark:border-gray-600">
-                                    <td class="px-4 py-3 text-gray-500">${i + 1}</td>
-                                    <td class="px-4 py-3 font-medium text-gray-800 dark:text-white">${item.name}</td>
-                                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${item.qty}</td>
-                                    <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">₹${item.price.toLocaleString('en-IN')}</td>
-                                    <td class="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white">₹${(item.price * item.qty).toLocaleString('en-IN')}</td>
+                                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-gray-500">${i + 1}</td>
+                                    <td class="px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-800 dark:text-white">${item.name}</td>
+                                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-center text-gray-700 dark:text-gray-300">${item.qty}</td>
+                                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-700 dark:text-gray-300 whitespace-nowrap">₹${item.price.toLocaleString('en-IN')}</td>
+                                    <td class="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold text-gray-800 dark:text-white whitespace-nowrap">₹${(item.price * item.qty).toLocaleString('en-IN')}</td>
                                 </tr>`).join('')}
                             </tbody>
                         </table>
-                        <div class="border-t border-gray-200 dark:border-gray-600 px-4 py-3 space-y-1">
-                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-600 px-3 sm:px-4 py-2.5 space-y-1 text-sm">
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400">
                                 <span>Subtotal</span><span>₹${(order.subtotal || order.total).toLocaleString('en-IN')}</span>
                             </div>
-                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400">
                                 <span>Shipping</span><span>${order.shipping ? '₹' + order.shipping.toLocaleString('en-IN') : 'Free'}</span>
                             </div>
-                            <div class="flex justify-between text-lg font-bold text-[#4A6741] pt-1 border-t border-gray-200 dark:border-gray-600">
+                            <div class="flex justify-between text-base sm:text-lg font-bold text-[#4A6741] pt-1 border-t border-gray-200 dark:border-gray-600">
                                 <span>Total</span><span>₹${order.total.toLocaleString('en-IN')}</span>
                             </div>
                         </div>
-                        ` : `<p class="p-4 text-gray-500">No product details available</p>`}
+                        ` : `<p class="p-4 text-gray-500 text-sm">No product details available</p>`}
                     </div>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Update Status</h4>
-                    <div class="flex flex-wrap gap-2">
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Update Status</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         ${['pending', 'shipped', 'delivered', 'cancelled'].map(s => `
                             <button onclick="Admin.updateOrderStatus(${order.id}, '${s}')"
-                                class="px-4 py-2 rounded-lg font-medium transition ${order.status === s ? 'bg-[#4A6741] text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'}">
+                                class="px-3 py-2 rounded-lg font-medium text-sm transition ${order.status === s ? '' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'}"
+                                ${order.status === s ? 'style="background:#4A6741;color:#fff"' : ''}>
                                 ${s.charAt(0).toUpperCase() + s.slice(1)}
                             </button>
                         `).join('')}
