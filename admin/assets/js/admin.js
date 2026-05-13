@@ -718,9 +718,42 @@ const UI = {
                     </div>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Order Summary</h4>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <p class="text-lg"><span class="text-gray-500">Total Amount:</span> <span class="font-bold text-[#4A6741]">₹${order.total.toLocaleString('en-IN')}</span></p>
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Products Ordered</h4>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        ${order.itemDetails && order.itemDetails.length ? `
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-600">
+                                <tr>
+                                    <th class="text-left px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">#</th>
+                                    <th class="text-left px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Product</th>
+                                    <th class="text-center px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Qty</th>
+                                    <th class="text-right px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Price</th>
+                                    <th class="text-right px-4 py-2.5 font-semibold text-gray-600 dark:text-gray-300">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${order.itemDetails.map((item, i) => `
+                                <tr class="border-t border-gray-200 dark:border-gray-600">
+                                    <td class="px-4 py-3 text-gray-500">${i + 1}</td>
+                                    <td class="px-4 py-3 font-medium text-gray-800 dark:text-white">${item.name}</td>
+                                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${item.qty}</td>
+                                    <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">₹${item.price.toLocaleString('en-IN')}</td>
+                                    <td class="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white">₹${(item.price * item.qty).toLocaleString('en-IN')}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                        <div class="border-t border-gray-200 dark:border-gray-600 px-4 py-3 space-y-1">
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                                <span>Subtotal</span><span>₹${(order.subtotal || order.total).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                                <span>Shipping</span><span>${order.shipping ? '₹' + order.shipping.toLocaleString('en-IN') : 'Free'}</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold text-[#4A6741] pt-1 border-t border-gray-200 dark:border-gray-600">
+                                <span>Total</span><span>₹${order.total.toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+                        ` : `<p class="p-4 text-gray-500">No product details available</p>`}
                     </div>
                 </div>
                 <div>
