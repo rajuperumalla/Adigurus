@@ -22,27 +22,39 @@ mongoose.connect(MONGODB_URI, clientOptions)
     .then(async () => {
         console.log('✅ Connected to MongoDB successfully!');
         
-        // Auto-migration: if MongoDB is empty, seed it from the old JSON files
+        // Auto-migration: seed from JSON files, upsert so new products are always added
         try {
             const productCount = await Product.countDocuments();
+            const products = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'products.json')));
+            const validProducts = products.filter(p => p.id != null);
+
             if (productCount === 0) {
+                // Fresh database — bulk insert everything
                 console.log('📦 Empty database detected. Migrating existing JSON data to MongoDB...');
-                const products = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'products.json')));
-                if (products.length > 0) await Product.insertMany(products);
-                
+                if (validProducts.length > 0) await Product.insertMany(validProducts);
+
                 const orders = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'orders.json')));
                 if (orders.length > 0) await Order.insertMany(orders);
-                
+
                 const discounts = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'discounts.json')));
                 if (discounts.length > 0) await Discount.insertMany(discounts);
-                
+
                 const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'settings.json')));
                 if (Object.keys(settings).length > 0) await Setting.create({ _id: 'global', ...settings });
-                
+
                 console.log('🎉 Migration complete! MongoDB is now fully populated.');
+            } else {
+                // Existing database — upsert any products from JSON that are missing in MongoDB
+                const ops = validProducts.map(p => ({
+                    updateOne: { filter: { id: p.id }, update: { $setOnInsert: p }, upsert: true }
+                }));
+                const result = await Product.bulkWrite(ops, { ordered: false });
+                if (result.upsertedCount > 0) {
+                    console.log(`📦 Added ${result.upsertedCount} missing product(s) to MongoDB.`);
+                }
             }
         } catch(e) {
-            console.log('Note: Data migration skipped or failed (perhaps no existing data found).', e.message);
+            console.log('Note: Data migration skipped or failed:', e.message);
         }
     })
     .catch(err => console.error('❌ MongoDB connection error:', err));

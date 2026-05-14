@@ -20,7 +20,7 @@
     "discount": 0,
     "badge": "Hot Sale",
     "image": "",
-    "description": "Fast-acting pain relief balm with wintergreen oil",
+    "description": "Herbal pain relief balm for joints and muscles",
     "createdAt": "2025-01-01T00:00:00.000Z"
   },
   {
@@ -44,7 +44,7 @@
     "discount": 0,
     "badge": "Recently Added",
     "image": "",
-    "description": "Pure ashwagandha extract for stress relief",
+    "description": "Pure ashwagandha root extract for stress relief and energy",
     "createdAt": "2025-01-01T00:00:00.000Z"
   },
   {
@@ -56,7 +56,7 @@
     "discount": 5,
     "badge": "",
     "image": "",
-    "description": "Digestive health supplement with three fruits",
+    "description": "Classic Ayurvedic digestive and detox powder",
     "createdAt": "2025-01-01T00:00:00.000Z"
   },
   {
@@ -68,7 +68,7 @@
     "discount": 0,
     "badge": "New Product",
     "image": "",
-    "description": "Premium face oil for glowing skin",
+    "description": "Luxury saffron face oil for glowing skin",
     "createdAt": "2025-01-01T00:00:00.000Z"
   },
   {
@@ -80,7 +80,7 @@
     "discount": 10,
     "badge": "",
     "image": "",
-    "description": "Ayurvedic oil for joint pain and stiffness",
+    "description": "Ayurvedic oil for joint pain and arthritis relief",
     "createdAt": "2025-01-01T00:00:00.000Z"
   },
   {
@@ -93,6 +93,78 @@
     "badge": "Limited Stock",
     "image": "",
     "description": "Memory enhancer with brahmi and pure ghee",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 9,
+    "name": "Medicated Hair Oil (2 Pack)",
+    "category": "Hair Care",
+    "price": 250,
+    "stock": 100,
+    "discount": 11,
+    "badge": "Best Seller",
+    "image": "",
+    "description": "Dandruff, Itchy Scalp & Hairfall — double pack value",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 10,
+    "name": "Pain Relief Oil",
+    "category": "Pain Relief",
+    "price": 220,
+    "stock": 150,
+    "discount": 12,
+    "badge": "Popular",
+    "image": "",
+    "description": "Joint, Muscle & Body Care",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 11,
+    "name": "Universal Oil",
+    "category": "Wellness",
+    "price": 99,
+    "stock": 200,
+    "discount": 8,
+    "badge": "",
+    "image": "",
+    "description": "Headache, Sinus & Cold Relief",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 12,
+    "name": "Sleep Balm",
+    "category": "Wellness",
+    "price": 90,
+    "stock": 180,
+    "discount": 17,
+    "badge": "",
+    "image": "",
+    "description": "Deep Sleep & Relaxation",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 13,
+    "name": "Herbal Inhaler",
+    "category": "Wellness",
+    "price": 135,
+    "stock": 120,
+    "discount": 16,
+    "badge": "",
+    "image": "",
+    "description": "Cold, Sinus & Headaches",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 14,
+    "name": "Charcoal Soap",
+    "category": "Skin Care",
+    "price": 110,
+    "stock": 160,
+    "discount": 27,
+    "badge": "",
+    "image": "",
+    "description": "Deep Cleansing & Detox",
     "createdAt": "2025-01-01T00:00:00.000Z"
   }
 ]
