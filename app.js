@@ -729,7 +729,7 @@ function _badgeClass(text) {
 
 async function injectProductBadges() {
     try {
-        const products = await fetch('/api/products').then(r => r.json());
+        const products = await fetch('/api/products', { cache: 'no-store' }).then(r => r.json());
 
         // Build name → badge map (normalised key)
         const badgeMap = {};
@@ -869,7 +869,9 @@ async function loadDynamicProducts() {
     if (!container) return;
 
     try {
-        const products = await fetch('/api/products').then(r => r.json());
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        const products = await res.json();
+        if (!Array.isArray(products)) throw new Error('Invalid API response');
 
         // Newest products first within each category — sort by createdAt DESC
         products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
