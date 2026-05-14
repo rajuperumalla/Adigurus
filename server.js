@@ -140,7 +140,11 @@ app.post('/api/admin/products', adminAuth, async (req, res) => {
 
 app.put('/api/admin/products/:id', adminAuth, async (req, res) => {
     const id = Number(req.params.id);
-    const product = await Product.findOneAndUpdate({ id }, { ...req.body, id }, { new: true, lean: true });
+    const product = await Product.findOneAndUpdate(
+        { id },
+        { $set: { ...req.body, id } },
+        { new: true, lean: true }
+    );
     if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
     res.json({ success: true, product });
 });

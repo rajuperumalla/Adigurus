@@ -782,55 +782,125 @@ async function injectProductBadges() {
     }
 }
 
+function _categoryIcon(category) {
+    const c = (category || '').toLowerCase();
+    if (c.includes('hair'))        return 'fas fa-tint';
+    if (c.includes('pain'))        return 'fas fa-hand-holding-heart';
+    if (c.includes('skin'))        return 'fas fa-spa';
+    if (c.includes('supplement'))  return 'fas fa-pills';
+    if (c.includes('wellness'))    return 'fas fa-leaf';
+    return 'fas fa-box';
+}
+
+function _renderProductCard(p) {
+    const posX = p.imagePosX ?? 50;
+    const posY = p.imagePosY ?? 50;
+    const zoom = p.imageZoom || 100;
+    const imgStyle = `object-fit:cover;object-position:${posX}% ${posY}%;transform:scale(${zoom / 100})`;
+    const originalPrice = p.discount > 0 ? Math.round(p.price / (1 - p.discount / 100)) : 0;
+    const badgeHtml = p.badge
+        ? `<div class="absolute top-3 left-3 z-10"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.25);${_badgeClass(p.badge)}">${Security.escapeHtml(p.badge)}</span></div>`
+        : '';
+
+    const imageInner = p.image
+        ? `<img src="${p.image}" alt="${Security.escapeHtml(p.name)}" class="w-full h-full" style="${imgStyle}" loading="lazy">${badgeHtml}`
+        : `<i class="${_categoryIcon(p.category)} text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>${badgeHtml}`;
+
+    const imageWrap = p.image
+        ? 'w-full h-52 bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden'
+        : 'w-full h-52 bg-gradient-to-br from-earth/10 to-gold/10 flex items-center justify-center relative overflow-hidden';
+
+    return `
+    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card"
+         data-product-id="p-${p.id}" data-product-name="${Security.escapeHtml(p.name)}" data-product-price="${Number(p.price).toFixed(2)}" data-product-icon="${_categoryIcon(p.category)}">
+        <div class="${imageWrap}">${imageInner}</div>
+        <div class="p-5 flex flex-col flex-grow">
+            <span class="text-[10px] font-semibold text-earth/60 uppercase tracking-widest mb-0.5">${Security.escapeHtml(p.category || '')}</span>
+            <h4 class="font-serif text-base text-earth mb-1 leading-snug">${Security.escapeHtml(p.name)}</h4>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">${Security.escapeHtml(p.description || '')}</p>
+            <p class="font-bold text-gold mb-4">
+                ₹${Number(p.price).toFixed(2)}
+                ${originalPrice ? `<span class="text-xs font-normal opacity-50 line-through ml-1">₹${originalPrice.toFixed(2)}</span>` : ''}
+            </p>
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
+                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
+                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
+            </div>
+            <div class="flex gap-2">
+                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
+                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+function _applyShopFilters() {
+    const allCb = document.getElementById('filter-all');
+    const otherCbs = Array.from(document.querySelectorAll('.shop-filter-checkbox')).filter(cb => cb !== allCb);
+    const selected = otherCbs.filter(cb => cb.checked).map(cb => cb.value);
+
+    const products = window._shopProducts || [];
+    const filtered = selected.length === 0
+        ? products
+        : products.filter(p => {
+            const cat = (p.category || '').toLowerCase();
+            return selected.some(s => cat.includes(s));
+        });
+
+    _renderShopGrid(filtered);
+}
+
+function _renderShopGrid(products) {
+    const container = document.getElementById('products-container');
+    if (!container) return;
+
+    if (!products.length) {
+        container.innerHTML = '<p class="text-center text-gray-400 col-span-full py-16">No products found in this category.</p>';
+        return;
+    }
+
+    container.innerHTML = products.map(_renderProductCard).join('');
+    wireProductCards();
+}
+
 async function loadDynamicProducts() {
-    const grid = document.getElementById('admin-products-grid');
-    if (!grid) return;
+    const container = document.getElementById('products-container');
+    if (!container) return;
 
     try {
         const products = await fetch('/api/products').then(r => r.json());
-        const withImages = products.filter(p => p.image);
-        if (!withImages.length) return;
 
-        document.getElementById('admin-products-section').classList.remove('hidden');
+        // Newest products first within each category — sort by createdAt DESC
+        products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        window._shopProducts = products;
 
-        grid.innerHTML = withImages.map(p => {
-            const posX = p.imagePosX ?? 50;
-            const posY = p.imagePosY ?? 50;
-            const zoom = p.imageZoom || 100;
-            const imgStyle = `object-fit:cover;object-position:${posX}% ${posY}%;transform:scale(${zoom / 100})`;
-            const originalPrice = p.discount > 0 ? Math.round(p.price / (1 - p.discount / 100)) : 0;
-            const badgeHtml = p.badge ? `<div class="absolute top-3 left-3 z-10"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.25);${_badgeClass(p.badge)}">${p.badge}</span></div>` : '';
+        // Hide loading spinner
+        const loading = document.getElementById('products-loading');
+        if (loading) loading.style.display = 'none';
 
-            return `
-            <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card"
-                 data-product-id="admin-${p.id}" data-product-name="${p.name}" data-product-price="${p.price.toFixed(2)}" data-product-icon="fas fa-box">
-                <div class="w-full h-52 bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                    <img src="${p.image}" alt="${p.name}" class="w-full h-full" style="${imgStyle}" loading="lazy">
-                    ${badgeHtml}
-                </div>
-                <div class="p-5 flex flex-col flex-grow">
-                    <span class="text-[10px] font-semibold text-earth/60 uppercase tracking-widest">${p.category || ''}</span>
-                    <h4 class="font-serif text-base text-earth mb-1 leading-snug">${p.name}</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">${p.description || ''}</p>
-                    <p class="font-bold text-gold mb-4">
-                        ₹${p.price.toFixed(2)}
-                        ${originalPrice ? `<span class="text-xs font-normal opacity-50 line-through ml-1">₹${originalPrice.toFixed(2)}</span>` : ''}
-                    </p>
-                    <div class="flex items-center justify-center gap-3 mb-3">
-                        <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                        <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                        <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                        <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
+        _renderShopGrid(products);
 
-        wireProductCards();
+        // Wire filter checkboxes
+        const allCb = document.getElementById('filter-all');
+        document.querySelectorAll('.shop-filter-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (cb === allCb && cb.checked) {
+                    // "All" checked → uncheck others
+                    document.querySelectorAll('.shop-filter-checkbox').forEach(o => { if (o !== allCb) o.checked = false; });
+                } else if (cb !== allCb && cb.checked) {
+                    // specific category checked → uncheck "All"
+                    if (allCb) allCb.checked = false;
+                } else if (cb !== allCb && !cb.checked) {
+                    // if none left checked, re-check "All"
+                    const anyChecked = Array.from(document.querySelectorAll('.shop-filter-checkbox')).some(o => o !== allCb && o.checked);
+                    if (!anyChecked && allCb) allCb.checked = true;
+                }
+                _applyShopFilters();
+            });
+        });
     } catch {
-        // API unavailable — skip dynamic products
+        const loading = document.getElementById('products-loading');
+        if (loading) loading.innerHTML = '<p class="text-gray-400 text-sm">Unable to load products. Please try again later.</p>';
     }
 }

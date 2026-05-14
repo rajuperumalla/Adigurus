@@ -25,6 +25,7 @@ module.exports = async function handler(req, res) {
 
     try {
         await getConnection();
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
         const products = await Product.find().sort({ _id: 1 }).lean();
         return res.status(200).json(products);
     } catch (err) {

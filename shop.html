@@ -316,10 +316,12 @@
                     <h3 class="font-serif text-xl mb-4">Filters</h3>
                     <div class="mb-6">
                         <h4 class="font-bold mb-2 text-sm uppercase tracking-widest opacity-70">Category</h4>
-                        <label class="block mb-2 text-sm"><input type="checkbox" class="mr-2" checked> All</label>
-                        <label class="block mb-2 text-sm"><input type="checkbox" class="mr-2"> Wellness</label>
-                        <label class="block mb-2 text-sm"><input type="checkbox" class="mr-2"> Haircare</label>
-                        <label class="block mb-2 text-sm"><input type="checkbox" class="mr-2"> Skincare</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input id="filter-all" type="checkbox" class="shop-filter-checkbox mr-2" value="all" checked> All</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input type="checkbox" class="shop-filter-checkbox mr-2" value="wellness"> Wellness</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input type="checkbox" class="shop-filter-checkbox mr-2" value="hair"> Haircare</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input type="checkbox" class="shop-filter-checkbox mr-2" value="skin"> Skincare</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input type="checkbox" class="shop-filter-checkbox mr-2" value="pain"> Pain Relief</label>
+                        <label class="block mb-2 text-sm cursor-pointer"><input type="checkbox" class="shop-filter-checkbox mr-2" value="supplement"> Supplements</label>
                     </div>
                     <div>
                         <h4 class="font-bold mb-2 text-sm uppercase tracking-widest opacity-70">Dosha</h4>
@@ -328,168 +330,16 @@
                         <label class="block mb-2 text-sm"><input type="checkbox" class="mr-2"> Kapha</label>
                     </div>
                 </div>
-                <!-- Products -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="hair-oil-2pack" data-product-name="Medicated Hair Oil (2 Pack)" data-product-price="250.00" data-product-icon="fas fa-tint">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-tint text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Best Seller</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Medicated Hair Oil (2 Pack)</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Dandruff, Itchy Scalp & Hairfall</p>
-                            <p class="font-bold text-gold mb-4">₹250.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹280.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
+                <!-- Dynamic Products Grid -->
+                <div class="flex-1 min-w-0">
+                    <div id="products-loading" class="flex flex-col items-center justify-center py-20 gap-4">
+                        <div class="w-10 h-10 border-4 border-earth/30 border-t-earth rounded-full animate-spin"></div>
+                        <p class="text-sm text-gray-400">Loading products…</p>
                     </div>
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="pain-relief-oil" data-product-name="Pain Relief Oil" data-product-price="220.00" data-product-icon="fas fa-hand-holding-heart">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-hand-holding-heart text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Popular</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Pain Relief Oil</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Joint, Muscle & Body Care</p>
-                            <p class="font-bold text-gold mb-4">₹220.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹250.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="universal-oil" data-product-name="Universal Oil" data-product-price="99.00" data-product-icon="fas fa-fire">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-fire text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Value</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Universal Oil</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Headache, Sinus & Cold Relief</p>
-                            <p class="font-bold text-gold mb-4">₹99.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹108.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="sleep-balm" data-product-name="Sleep Balm" data-product-price="90.00" data-product-icon="fas fa-moon">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-moon text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Calm</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Sleep Balm</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Deep Sleep & Relaxation</p>
-                            <p class="font-bold text-gold mb-4">₹90.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹108.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="herbal-inhaler" data-product-name="Herbal Inhaler" data-product-price="135.00" data-product-icon="fas fa-wind">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-wind text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Fast Act</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Herbal Inhaler</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Cold, Sinus & Headaches</p>
-                            <p class="font-bold text-gold mb-4">₹135.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹160.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass rounded-xl overflow-hidden card-shadow group relative flex flex-col h-full product-card" data-product-id="charcoal-soap" data-product-name="Charcoal Soap" data-product-price="110.00" data-product-icon="fas fa-spa">
-                        <div class="w-full h-52 flex items-center justify-center bg-gradient-to-br from-earth/10 to-gold/10 relative overflow-hidden">
-                            <i class="fas fa-spa text-6xl text-earth/30 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute top-3 right-3">
-                                <span class="bg-gold/20 text-earth text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Pure</span>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h4 class="font-serif text-base text-earth mb-1 leading-snug">Charcoal Soap</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed flex-grow">Deep Cleansing & Detox</p>
-                            <p class="font-bold text-gold mb-4">₹110.00 <span class="text-xs font-normal opacity-50 line-through ml-1">₹150.00</span></p>
-                            <!-- Qty Selector -->
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <button class="qty-minus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">−</button>
-                                <span class="qty-display text-sm font-bold w-5 text-center text-gray-800 dark:text-gray-200">1</span>
-                                <button class="qty-plus w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold leading-none text-gray-500">+</button>
-                            </div>
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
-                                <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
             </div>
 </section>
-
-    <!-- Dynamic Products from Admin (loaded from API) -->
-    <section id="admin-products-section" class="hidden py-12 px-6 md:px-12 max-w-7xl mx-auto">
-        <h2 class="text-3xl font-serif text-earth mb-8 text-center">More Products</h2>
-        <div id="admin-products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        </div>
-    </section>
 
     </main>
 

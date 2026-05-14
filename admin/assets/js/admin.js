@@ -182,12 +182,26 @@ const API = {
     },
 
     async uploadImage(file) {
-        // Local dev: convert to data-URL for preview (no Cloudinary required)
         return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload  = (e) => resolve({ success: true, url: e.target.result });
-            reader.onerror = ()  => resolve({ success: false, error: 'Upload failed' });
-            reader.readAsDataURL(file);
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+                const MAX = 800;
+                let w = img.naturalWidth, h = img.naturalHeight;
+                if (w > MAX || h > MAX) {
+                    const r = Math.min(MAX / w, MAX / h);
+                    w = Math.round(w * r);
+                    h = Math.round(h * r);
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                resolve({ success: true, url: canvas.toDataURL('image/jpeg', 0.78) });
+            };
+            img.onerror = () => resolve({ success: false, error: 'Upload failed' });
+            img.src = objectUrl;
         });
     },
 
@@ -1059,6 +1073,10 @@ const UI = {
         if (imageFile) {
             const upload = await API.uploadImage(imageFile);
             if (upload.success) productData.image = upload.url;
+        } else if (productData.id) {
+            // Preserve existing image when editing without uploading a new one
+            const existing = state.products.find(p => p.id == productData.id);
+            if (existing && existing.image) productData.image = existing.image;
         }
 
         const result = await API.saveProduct(productData);
