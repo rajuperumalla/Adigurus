@@ -828,12 +828,11 @@ const UI = {
                         const isFirst = idx === 0;
                         const isLast  = idx === list.length - 1;
                         return `
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden group flex flex-col">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden flex flex-col">
                             <div class="aspect-square bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 flex items-center justify-center relative overflow-hidden">
                                 ${product.image
                                     ? `<img src="${product.image}" alt="${product.name}" class="w-full h-full" style="object-fit:cover;object-position:${product.imagePosX ?? 50}% ${product.imagePosY ?? 50}%;transform:scale(${(product.imageZoom || 100) / 100})">`
                                     : `<i class="fas fa-box text-6xl text-gray-300 dark:text-gray-600"></i>`}
-                                <!-- Dynamic banner label (top-left) -->
                                 ${product.badge ? `
                                 <div style="position:absolute;top:8px;left:8px;z-index:10;">
                                     <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
@@ -842,15 +841,6 @@ const UI = {
                                         ${product.badge}
                                     </span>
                                 </div>` : ''}
-                                <!-- Edit / Delete overlay -->
-                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <button onclick="Admin.editProduct(${product.id})" class="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition" title="Edit">
-                                        <i class="fas fa-edit text-gray-700"></i>
-                                    </button>
-                                    <button onclick="Admin.deleteProduct(${product.id})" class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition" title="Delete">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </div>
                             </div>
                             <div class="p-4 flex flex-col flex-1">
                                 <span class="text-xs font-semibold text-[#4A6741] dark:text-[#D4AF37]">${product.category}</span>
@@ -862,9 +852,18 @@ const UI = {
                                     </div>
                                     <span class="text-xs ${product.stock > 20 ? 'text-green-500' : product.stock > 5 ? 'text-orange-500' : 'text-red-500'}">${product.stock} in stock</span>
                                 </div>
-                                <!-- Reorder controls -->
+                                <!-- Edit / Delete + Reorder controls -->
                                 <div class="flex items-center gap-1 mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                    <span class="text-[10px] text-gray-400 mr-auto">Reorder</span>
+                                    <button onclick="Admin.editProduct(${product.id})"
+                                        class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-[#4A6741] hover:text-[#4A6741] transition text-xs font-medium"
+                                        title="Edit">
+                                        <i class="fas fa-edit text-xs"></i> Edit
+                                    </button>
+                                    <button onclick="Admin.deleteProduct(${product.id})"
+                                        class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-300 text-red-500 hover:bg-red-500 hover:text-white transition text-xs font-medium"
+                                        title="Delete">
+                                        <i class="fas fa-trash text-xs"></i> Delete
+                                    </button>
                                     <button onclick="Admin.reorderProduct(${product.id}, 'up')"
                                         ${isFirst ? 'disabled' : ''}
                                         class="w-7 h-7 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-500 hover:border-[#4A6741] hover:text-[#4A6741] disabled:opacity-30 disabled:cursor-not-allowed transition"
@@ -918,7 +917,16 @@ const UI = {
             title.textContent = 'Edit Product';
             document.getElementById('editProductId').value     = product.id;
             document.getElementById('productName').value       = product.name;
-            document.getElementById('productCategory').value   = product.category;
+            const knownCats = ['Hair Care','Pain Relief','Skin Care','Wellness','Supplements','Digestive Care','Immunity',"Women's Health","Men's Health","Baby Care"];
+            const catSel = document.getElementById('productCategory');
+            const customCatInput = document.getElementById('customCategory');
+            if (knownCats.includes(product.category)) {
+                catSel.value = product.category;
+                if (customCatInput) { customCatInput.classList.add('hidden'); customCatInput.value = ''; }
+            } else {
+                catSel.value = '__custom__';
+                if (customCatInput) { customCatInput.classList.remove('hidden'); customCatInput.value = product.category; }
+            }
             document.getElementById('productDescription').value = product.description;
             document.getElementById('productPrice').value      = product.price;
             document.getElementById('productStock').value      = product.stock;
@@ -945,6 +953,8 @@ const UI = {
         } else {
             title.textContent = 'Add New Product';
             document.getElementById('editProductId').value = '';
+            const customCatInput = document.getElementById('customCategory');
+            if (customCatInput) { customCatInput.classList.add('hidden'); customCatInput.value = ''; }
             document.getElementById('imageCropControls').classList.add('hidden');
             document.getElementById('imageZoom').value = 100;
             document.getElementById('imagePosX').value = 50;
@@ -988,9 +998,30 @@ const UI = {
         this.updateCustomerPreview();
     },
 
+    onCategoryChange(value) {
+        const custom = document.getElementById('customCategory');
+        if (!custom) return;
+        if (value === '__custom__') {
+            custom.classList.remove('hidden');
+            custom.focus();
+        } else {
+            custom.classList.add('hidden');
+            custom.value = '';
+        }
+        this.updateCustomerPreview();
+    },
+
+    _getCategory() {
+        const sel = document.getElementById('productCategory')?.value || '';
+        if (sel === '__custom__') {
+            return (document.getElementById('customCategory')?.value || '').trim();
+        }
+        return sel;
+    },
+
     updateCustomerPreview() {
         const name = document.getElementById('productName')?.value || 'Product Name';
-        const cat = document.getElementById('productCategory')?.value || 'Category';
+        const cat = this._getCategory() || 'Category';
         const price = document.getElementById('productPrice')?.value || '0';
         const el = (id) => document.getElementById(id);
         if (el('customerPreviewName')) el('customerPreviewName').textContent = name;
@@ -1013,7 +1044,7 @@ const UI = {
         const productData = {
             id:          idVal ? Number(idVal) : null,
             name:        document.getElementById('productName').value,
-            category:    document.getElementById('productCategory').value,
+            category:    this._getCategory(),
             description: document.getElementById('productDescription').value,
             price:       parseFloat(document.getElementById('productPrice').value),
             stock:       parseInt(document.getElementById('productStock').value),
