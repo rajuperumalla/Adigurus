@@ -410,14 +410,33 @@
                 <!-- Image Upload -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</label>
-                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                    <div id="imageUploadArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
                         <input type="file" id="productImage" accept="image/*" class="hidden">
-                        <label for="productImage" class="cursor-pointer">
+                        <!-- Upload prompt (visible when no image) -->
+                        <label id="imageUploadLabel" for="productImage" class="cursor-pointer">
                             <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
                             <p class="text-sm text-gray-600 dark:text-gray-400">Click to upload or drag and drop</p>
                             <p class="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                         </label>
-                        <img id="imagePreview" class="mt-4 max-h-48 mx-auto rounded-lg hidden">
+                        <!-- Image preview with remove button (visible when image selected) -->
+                        <div id="imagePreviewWrapper" class="hidden">
+                            <div class="relative inline-block">
+                                <img id="imagePreview" class="max-h-48 mx-auto rounded-lg">
+                                <button type="button" onclick="Admin.removeImage()"
+                                    class="absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg transition text-xs"
+                                    title="Remove image">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 flex items-center justify-center gap-3">
+                                <label for="productImage" class="cursor-pointer text-xs text-[#4A6741] hover:underline font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i> Change Image
+                                </label>
+                                <button type="button" onclick="Admin.removeImage()" class="text-xs text-red-500 hover:underline font-medium">
+                                    <i class="fas fa-trash-alt mr-1"></i> Remove
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

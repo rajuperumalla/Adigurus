@@ -956,23 +956,30 @@ const UI = {
 
             if (product.image) {
                 preview.src = product.image;
-                preview.classList.remove('hidden');
+                document.getElementById('imageUploadLabel').classList.add('hidden');
+                document.getElementById('imagePreviewWrapper').classList.remove('hidden');
                 document.getElementById('imageCropControls').classList.remove('hidden');
                 document.getElementById('imageZoom').value = product.imageZoom || 100;
                 document.getElementById('imagePosX').value = product.imagePosX ?? 50;
                 document.getElementById('imagePosY').value = product.imagePosY ?? 50;
                 this.updateImagePreview();
+            } else {
+                document.getElementById('imageUploadLabel').classList.remove('hidden');
+                document.getElementById('imagePreviewWrapper').classList.add('hidden');
             }
         } else {
             title.textContent = 'Add New Product';
             document.getElementById('editProductId').value = '';
             const customCatInput = document.getElementById('customCategory');
             if (customCatInput) { customCatInput.classList.add('hidden'); customCatInput.value = ''; }
+            document.getElementById('imageUploadLabel').classList.remove('hidden');
+            document.getElementById('imagePreviewWrapper').classList.add('hidden');
             document.getElementById('imageCropControls').classList.add('hidden');
             document.getElementById('imageZoom').value = 100;
             document.getElementById('imagePosX').value = 50;
             document.getElementById('imagePosY').value = 50;
         }
+        this._removedImage = false;
 
         modal.classList.add('active');
         this.updateCustomerPreview();
@@ -984,7 +991,8 @@ const UI = {
         reader.onload = (e) => {
             const img = document.getElementById('imagePreview');
             img.src = e.target.result;
-            img.classList.remove('hidden');
+            document.getElementById('imageUploadLabel').classList.add('hidden');
+            document.getElementById('imagePreviewWrapper').classList.remove('hidden');
             document.getElementById('imageZoom').value = 100;
             document.getElementById('imagePosX').value = 50;
             document.getElementById('imagePosY').value = 50;
@@ -992,6 +1000,18 @@ const UI = {
             this.updateImagePreview();
         };
         reader.readAsDataURL(file);
+    },
+
+    removeImage() {
+        document.getElementById('productImage').value = '';
+        document.getElementById('imagePreview').src = '';
+        document.getElementById('imageUploadLabel').classList.remove('hidden');
+        document.getElementById('imagePreviewWrapper').classList.add('hidden');
+        document.getElementById('imageCropControls').classList.add('hidden');
+        document.getElementById('imageZoom').value = 100;
+        document.getElementById('imagePosX').value = 50;
+        document.getElementById('imagePosY').value = 50;
+        this._removedImage = true;
     },
 
     updateImagePreview() {
@@ -1087,8 +1107,9 @@ const UI = {
         if (imageFile) {
             const upload = await API.uploadImage(imageFile);
             if (upload.success) productData.image = upload.url;
+        } else if (this._removedImage) {
+            productData.image = '';
         } else if (productData.id) {
-            // Preserve existing image when editing without uploading a new one
             const existing = state.products.find(p => p.id == productData.id);
             if (existing && existing.image) productData.image = existing.image;
         }
