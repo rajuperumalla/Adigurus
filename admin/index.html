@@ -421,18 +421,18 @@
                     </div>
                 </div>
 
-                <!-- Image Adjust — side-by-side: Customer Preview (left) | Adjust Controls (right) -->
+                <!-- Image Adjust Panel — Customer Preview (left) | Sliders (right) -->
                 <div id="imageCropControls" class="hidden mt-0">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 md:p-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
 
-                        <!-- LEFT: Customer View Preview -->
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide flex items-center gap-1.5">
-                                <i class="fas fa-eye text-[#4A6741]"></i> Customer View Preview
-                            </p>
-                            <div class="flex-1 flex items-center justify-center">
-                                <div id="customerPreviewCard" class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg w-full max-w-[240px]">
-                                    <div class="w-full h-[200px] bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 relative overflow-hidden">
+                            <!-- LEFT: Customer View Preview -->
+                            <div class="flex flex-col">
+                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                                    <i class="fas fa-eye text-[#4A6741]"></i> Customer View Preview
+                                </p>
+                                <div id="customerPreviewCard" class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg flex-1 flex flex-col">
+                                    <div class="w-full flex-1 min-h-[220px] bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 relative overflow-hidden">
                                         <img id="customerPreviewImg" src="" class="w-full h-full" style="object-fit:cover;object-position:50% 50%;">
                                     </div>
                                     <div class="p-3">
@@ -442,44 +442,51 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-[10px] text-gray-400 text-center mt-3">This is how the product appears to customers</p>
-                        </div>
 
-                        <!-- RIGHT: Adjust Image Fit -->
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide flex items-center gap-1.5">
-                                <i class="fas fa-crop-alt text-[#D4AF37]"></i> Adjust Image Fit
-                            </p>
+                            <!-- RIGHT: Adjust Image Fit (3 sliders) -->
+                            <div class="flex flex-col justify-center">
+                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-5 flex items-center gap-1.5">
+                                    <i class="fas fa-sliders-h text-[#D4AF37]"></i> Adjust Image Fit
+                                </p>
 
-                            <!-- Drag-to-position area -->
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1"><i class="fas fa-arrows-alt text-xs"></i> Drag to set focal point</p>
-                            <div id="imageDragArea" class="relative w-full h-[160px] rounded-lg overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-500 cursor-crosshair bg-gray-100 dark:bg-gray-800 mb-2" style="touch-action:none;">
-                                <img id="dragAreaImg" src="" class="w-full h-full" style="object-fit:cover;object-position:50% 50%;pointer-events:none;">
-                                <div id="dragCrosshair" class="absolute w-5 h-5 rounded-full border-2 border-white shadow-lg" style="background:rgba(74,103,65,0.7);transform:translate(-50%,-50%);left:50%;top:50%;pointer-events:none;"></div>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mb-3 text-center">Position: <span id="posXVal">50</span>% × <span id="posYVal">50</span>%</p>
-
-                            <!-- Zoom controls -->
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1"><i class="fas fa-search-plus text-xs"></i> Zoom Level</p>
-                            <div class="flex items-center gap-2 mb-3">
-                                <button type="button" onclick="Admin.zoomOut()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-base font-bold flex-shrink-0">−</button>
-                                <div class="flex-1">
-                                    <input type="range" id="imageZoom" min="100" max="300" value="100" class="w-full accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                                <!-- Zoom slider -->
+                                <div class="mb-5">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Zoom</label>
+                                        <span id="zoomVal" class="text-xs font-semibold text-[#4A6741] bg-[#4A6741]/10 px-2 py-0.5 rounded">1.0x</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="Admin.zoomOut()" class="w-7 h-7 flex items-center justify-center rounded-md bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-sm font-bold flex-shrink-0">−</button>
+                                        <input type="range" id="imageZoom" min="100" max="300" value="100" class="flex-1 accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                                        <button type="button" onclick="Admin.zoomIn()" class="w-7 h-7 flex items-center justify-center rounded-md bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-sm font-bold flex-shrink-0">+</button>
+                                    </div>
                                 </div>
-                                <button type="button" onclick="Admin.zoomIn()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-base font-bold flex-shrink-0">+</button>
-                                <span class="text-xs text-gray-500 dark:text-gray-400 w-10 text-center font-medium flex-shrink-0" id="zoomVal">1.0x</span>
-                            </div>
 
-                            <input type="hidden" id="imagePosX" value="50">
-                            <input type="hidden" id="imagePosY" value="50">
+                                <!-- Vertical Position slider -->
+                                <div class="mb-5">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Vertical Position</label>
+                                        <span id="posYVal" class="text-xs font-semibold text-[#4A6741] bg-[#4A6741]/10 px-2 py-0.5 rounded">50%</span>
+                                    </div>
+                                    <input type="range" id="imagePosY" min="0" max="100" value="50" class="w-full accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                                </div>
 
-                            <div class="mt-auto pt-2">
-                                <button type="button" onclick="Admin.resetImagePosition()" class="w-full text-xs text-center py-1.5 rounded-lg border border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                <!-- Horizontal Position slider -->
+                                <div class="mb-5">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Horizontal Position</label>
+                                        <span id="posXVal" class="text-xs font-semibold text-[#4A6741] bg-[#4A6741]/10 px-2 py-0.5 rounded">50%</span>
+                                    </div>
+                                    <input type="range" id="imagePosX" min="0" max="100" value="50" class="w-full accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                                </div>
+
+                                <!-- Reset button -->
+                                <button type="button" onclick="Admin.resetImagePosition()" class="w-full text-xs text-center py-2 rounded-lg border border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 transition mt-auto">
                                     <i class="fas fa-undo mr-1"></i> Reset to Default
                                 </button>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
                 
