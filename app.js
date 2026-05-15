@@ -446,9 +446,10 @@ function wireProductCards() {
     const detailQty    = document.getElementById('detail-qty-display');
     const detailPage   = document.getElementById('detail-product-section');
 
-    if (detailPage) {
+    if (detailPage && detailPage.dataset.productName && !detailPage._wired) {
+        detailPage._wired = true;
         let qty = 1;
-        const name  = detailPage.dataset.productName  || 'Product';
+        const name  = detailPage.dataset.productName;
         const price = parseFloat(detailPage.dataset.productPrice) || 0;
         const id    = detailPage.dataset.productId    || 'product-1';
         const icon  = detailPage.dataset.productIcon  || 'fas fa-leaf';
@@ -575,6 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Load admin-uploaded products on shop page ────────
     loadDynamicProducts();
+
+    // ── Load product detail page ─────────────────────────
+    loadProductDetailPage();
 
     // ── Checkout page init ────────────────────────────────
     initCheckoutPage();
@@ -727,58 +731,86 @@ function _badgeClass(text) {
     return 'background:#4A6741;color:#fff';
 }
 
+function _matchApiProduct(cardName, products) {
+    const cn = cardName.toLowerCase().trim();
+    for (const p of products) {
+        const apiName = p.name.toLowerCase().trim();
+        const base = apiName.split('(')[0].trim();
+        if (cn.includes(base) || base.includes(cn) || cn === apiName) return p;
+    }
+    return null;
+}
+
 async function injectProductBadges() {
     try {
         const products = await fetch('/api/products', { cache: 'no-store' }).then(r => r.json());
 
-        // Build name → badge map (normalised key)
-        const badgeMap = {};
-        products.forEach(p => {
-            if (p.badge) badgeMap[p.name.toLowerCase().trim()] = p.badge;
-        });
-        if (!Object.keys(badgeMap).length) return;
-
         document.querySelectorAll('[data-product-name]').forEach(card => {
-            const cardName = (card.dataset.productName || '').toLowerCase().trim();
+            const cardName = (card.dataset.productName || '');
+            const matched = _matchApiProduct(cardName, products);
+            if (!matched) return;
 
-            // Match: find any API product name that is contained in (or contains) the card name
-            let badge = null;
-            for (const [apiName, b] of Object.entries(badgeMap)) {
-                const base = apiName.split('(')[0].trim(); // strip "(2 Pack)" etc.
-                if (cardName.includes(base) || base.includes(cardName)) {
-                    badge = b;
-                    break;
+            // Sync price from API
+            const priceEl = card.querySelector('.text-gold');
+            if (priceEl && matched.price != null) {
+                const origPrice = matched.discount > 0 ? Math.round(matched.price / (1 - matched.discount / 100)) : 0;
+                priceEl.innerHTML = `₹${Number(matched.price).toFixed(2)}` +
+                    (origPrice ? ` <span class="text-xs font-normal opacity-50 line-through ml-1">₹${origPrice.toFixed(2)}</span>` : '');
+                card.dataset.productPrice = Number(matched.price).toFixed(2);
+            }
+
+            // Sync image from API
+            const imageArea = card.querySelector('.h-52, [class*="aspect-"], [class*="h-48"], [class*="h-44"]') || card.querySelector('div');
+            if (imageArea && matched.image) {
+                const existingImg = imageArea.querySelector('img');
+                if (existingImg) {
+                    existingImg.src = matched.image;
+                    existingImg.style.objectPosition = `${matched.imagePosX ?? 50}% ${matched.imagePosY ?? 50}%`;
+                    existingImg.style.transform = `scale(${(matched.imageZoom || 100) / 100})`;
+                } else {
+                    const icon = imageArea.querySelector('i');
+                    if (icon) icon.style.display = 'none';
+                    const img = document.createElement('img');
+                    img.src = matched.image;
+                    img.alt = matched.name;
+                    img.className = 'w-full h-full';
+                    img.style.cssText = `object-fit:cover;object-position:${matched.imagePosX ?? 50}% ${matched.imagePosY ?? 50}%;transform:scale(${(matched.imageZoom || 100) / 100})`;
+                    img.loading = 'lazy';
+                    imageArea.appendChild(img);
                 }
             }
-            if (!badge) return;
 
-            // Find the image area (first child div that has relative/overflow or h-52)
-            const imageArea = card.querySelector('.h-52, [class*="aspect-"], [class*="h-48"], [class*="h-44"]')
-                           || card.querySelector('div');
-            if (!imageArea) return;
-
-            // Remove any previous dynamic badge on this card
-            imageArea.querySelector('.dynamic-badge-label')?.remove();
-
-            const span = document.createElement('span');
-            span.className = 'dynamic-badge-label';
-            span.style.cssText = `
-                position:absolute; top:10px; left:10px; z-index:20;
-                font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
-                padding:3px 8px; border-radius:999px; white-space:nowrap;
-                box-shadow:0 1px 4px rgba(0,0,0,.25);
-                ${_badgeClass(badge)}
-            `;
-            span.textContent = badge;
-
-            // Ensure positioning context
-            if (getComputedStyle(imageArea).position === 'static') {
-                imageArea.style.position = 'relative';
+            // Inject dynamic badge
+            if (matched.badge && imageArea) {
+                imageArea.querySelector('.dynamic-badge-label')?.remove();
+                const span = document.createElement('span');
+                span.className = 'dynamic-badge-label';
+                span.style.cssText = `
+                    position:absolute; top:10px; left:10px; z-index:20;
+                    font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+                    padding:3px 8px; border-radius:999px; white-space:nowrap;
+                    box-shadow:0 1px 4px rgba(0,0,0,.25);
+                    ${_badgeClass(matched.badge)}
+                `;
+                span.textContent = matched.badge;
+                if (getComputedStyle(imageArea).position === 'static') imageArea.style.position = 'relative';
+                imageArea.appendChild(span);
             }
-            imageArea.appendChild(span);
+
+            // Inject "View Detail" link if not already present
+            if (!card.querySelector('.view-detail-link')) {
+                const actionDiv = card.querySelector('.flex.gap-2');
+                if (actionDiv) {
+                    const link = document.createElement('a');
+                    link.href = `product.html?id=${matched.id}`;
+                    link.className = 'view-detail-link block text-center text-earth text-xs font-semibold mt-2 hover:underline transition';
+                    link.textContent = 'View Detail';
+                    actionDiv.parentElement.appendChild(link);
+                }
+            }
         });
     } catch {
-        // Server offline — silently skip badge injection
+        // Server offline — silently skip sync
     }
 }
 
@@ -831,6 +863,7 @@ function _renderProductCard(p) {
                 <button class="add-to-cart-btn flex-grow bg-earth text-white py-2.5 rounded-full text-xs font-bold uppercase tracking-wide hover:opacity-90 transition">Add to Cart</button>
                 <button class="buy-now-btn px-4 py-2.5 border border-earth text-earth rounded-full text-xs font-bold uppercase tracking-wide hover:bg-earth hover:text-white transition whitespace-nowrap">Buy Now</button>
             </div>
+            <a href="product.html?id=${p.id}" class="block text-center text-earth text-xs font-semibold mt-2 hover:underline transition">View Detail</a>
         </div>
     </div>`;
 }
@@ -862,6 +895,81 @@ function _renderShopGrid(products) {
 
     container.innerHTML = products.map(_renderProductCard).join('');
     wireProductCards();
+}
+
+async function loadProductDetailPage() {
+    const section = document.getElementById('product-page');
+    if (!section) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = Number(params.get('id'));
+    if (!productId) {
+        document.getElementById('product-loading').style.display = 'none';
+        document.getElementById('product-error').classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        const products = await res.json();
+        const p = products.find(item => item.id === productId);
+
+        document.getElementById('product-loading').style.display = 'none';
+
+        if (!p) {
+            document.getElementById('product-error').classList.remove('hidden');
+            return;
+        }
+
+        document.title = `${p.name} | Adiguru's`;
+
+        const detail = document.getElementById('product-detail');
+        const wrap = document.getElementById('detail-product-section');
+        wrap.dataset.productId = 'p-' + p.id;
+        wrap.dataset.productName = p.name;
+        wrap.dataset.productPrice = Number(p.price).toFixed(2);
+        wrap.dataset.productIcon = _categoryIcon(p.category);
+
+        if (p.image) {
+            const img = document.getElementById('product-image');
+            img.src = p.image;
+            img.alt = p.name;
+            img.style.objectPosition = `${p.imagePosX ?? 50}% ${p.imagePosY ?? 50}%`;
+            img.style.transform = `scale(${(p.imageZoom || 100) / 100})`;
+            img.classList.remove('hidden');
+            document.getElementById('product-placeholder-icon').classList.add('hidden');
+        }
+
+        if (p.badge) {
+            const badgeWrap = document.getElementById('product-badge-wrap');
+            const badgeEl = document.getElementById('product-badge');
+            badgeEl.textContent = p.badge;
+            badgeEl.style.cssText = _badgeClass(p.badge);
+            badgeWrap.classList.remove('hidden');
+        }
+
+        document.getElementById('product-category').textContent = p.category;
+        document.getElementById('product-name').textContent = p.name;
+
+        const originalPrice = p.discount > 0 ? Math.round(p.price / (1 - p.discount / 100)) : 0;
+        document.getElementById('product-price').innerHTML =
+            `₹${Number(p.price).toFixed(2)}` +
+            (originalPrice ? ` <span class="text-sm font-normal opacity-50 line-through ml-2">₹${originalPrice.toFixed(2)}</span>` : '');
+
+        document.getElementById('product-description').textContent = p.description || '';
+
+        if (p.createdAt) {
+            const dateEl = document.getElementById('product-created');
+            document.getElementById('product-created-date').textContent = new Date(p.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+            dateEl.classList.remove('hidden');
+        }
+
+        detail.classList.remove('hidden');
+        wireProductCards();
+    } catch {
+        document.getElementById('product-loading').style.display = 'none';
+        document.getElementById('product-error').classList.remove('hidden');
+    }
 }
 
 async function loadDynamicProducts() {

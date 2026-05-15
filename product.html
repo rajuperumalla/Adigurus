@@ -308,34 +308,53 @@
 
     <!-- MAIN CONTENT AREA -->
     <main class="flex-grow">
-<section id="product-page" class="page-section py-12 px-6 md:px-12 max-w-6xl mx-auto">
-            <a href="shop.html" class="nav-link text-sm opacity-70 mb-6 inline-block hover:text-gold" ><i class="fas fa-arrow-left"></i> Back to Shop</a>
-            <div class="flex flex-col md:flex-row gap-12 glass p-8 rounded-3xl">
-                <div class="w-full md:w-1/2">
-                    <img src="images/hair-oil.jpg" class="w-full h-[500px] object-cover rounded-2xl card-shadow" alt="Medicated Hair Oil" loading="lazy">
-                </div>
-                <div class="w-full md:w-1/2 flex flex-col justify-center">
-                    <div class="flex items-center gap-2 mb-2 text-gold text-sm">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i> (128 Reviews)
-                    </div>
-                    <h1 class="text-4xl font-serif text-earth mb-2">Medicated Hair Oil</h1>
-                    <p class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">₹250.00 <span class="text-sm font-normal opacity-50 line-through ml-2">₹280.00</span></p>
-                    <p class="mb-8 opacity-80 leading-relaxed">Adiguru's Medicated Hair Oil – For Dandruff, Itchy Scalp, Hairfall Control (2 Pack). Crafted patiently using pure herbs and essential oils to restore balance to your health naturally.</p>
-                    
-                    <div class="mb-8">
-                        <h4 class="font-bold mb-2 uppercase tracking-widest text-sm">Key Benefits</h4>
-                        <div class="flex gap-4">
-                            <span class="bg-earth/10 text-earth px-4 py-2 rounded-full text-sm">Dandruff Control</span>
-                            <span class="bg-earth/10 text-earth px-4 py-2 rounded-full text-sm">Hairfall Reduction</span>
-                            <span class="bg-earth/10 text-earth px-4 py-2 rounded-full text-sm">Scalp Soothing</span>
+        <section id="product-page" class="page-section py-12 px-6 md:px-12 max-w-6xl mx-auto">
+            <a href="shop.html" class="nav-link text-sm opacity-70 mb-6 inline-block hover:text-gold"><i class="fas fa-arrow-left"></i> Back to Shop</a>
+
+            <!-- Loading state -->
+            <div id="product-loading" class="flex flex-col items-center justify-center py-20 gap-4">
+                <div class="leaf-loader"></div>
+                <p class="text-sm text-gray-400">Loading product…</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="product-error" class="hidden text-center py-20">
+                <i class="fas fa-exclamation-circle text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Product not found. <a href="shop.html" class="text-earth hover:underline">Browse all products</a></p>
+            </div>
+
+            <!-- Dynamic product detail -->
+            <div id="product-detail" class="hidden">
+                <div id="detail-product-section" class="flex flex-col md:flex-row gap-12 glass p-8 rounded-3xl"
+                     data-product-id="" data-product-name="" data-product-price="" data-product-icon="fas fa-leaf">
+                    <div class="w-full md:w-1/2">
+                        <div id="product-image-wrap" class="w-full h-[500px] bg-gradient-to-br from-earth/10 to-gold/10 flex items-center justify-center rounded-2xl card-shadow overflow-hidden relative">
+                            <i id="product-placeholder-icon" class="fas fa-box text-6xl text-earth/30"></i>
+                            <img id="product-image" class="hidden w-full h-full object-cover" alt="" loading="lazy">
                         </div>
                     </div>
+                    <div class="w-full md:w-1/2 flex flex-col justify-center">
+                        <div id="product-badge-wrap" class="hidden mb-3">
+                            <span id="product-badge" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"></span>
+                        </div>
+                        <span id="product-category" class="text-[10px] font-semibold text-earth/60 uppercase tracking-widest mb-1"></span>
+                        <h1 id="product-name" class="text-4xl font-serif text-earth mb-2"></h1>
+                        <p id="product-price" class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6"></p>
+                        <p id="product-description" class="mb-8 opacity-80 leading-relaxed"></p>
+                        <div id="product-created" class="hidden mb-6 text-xs text-gray-400">
+                            <i class="far fa-clock mr-1"></i> Added on <span id="product-created-date"></span>
+                        </div>
 
-                    <div class="flex gap-4 mb-4">
-                        <input type="number" value="1" min="1" class="w-20 pl-4 border border-gray-300 rounded-full bg-transparent dark:border-gray-600 focus:outline-none focus:border-earth">
-                        <button class="flex-grow bg-earth text-white py-3 rounded-full hover:bg-opacity-90 transition card-shadow font-medium tracking-wide">Add to Cart</button>
+                        <div class="flex items-center justify-center gap-4 mb-4">
+                            <button id="detail-qty-minus" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold text-gray-500">−</button>
+                            <span id="detail-qty-display" class="text-lg font-bold w-6 text-center text-gray-800 dark:text-gray-200">1</span>
+                            <button id="detail-qty-plus" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-earth hover:text-earth transition text-lg font-bold text-gray-500">+</button>
+                        </div>
+                        <div class="flex gap-4 mb-4">
+                            <button id="detail-add-cart" class="flex-grow bg-earth text-white py-3 rounded-full hover:bg-opacity-90 transition card-shadow font-medium tracking-wide">Add to Cart</button>
+                        </div>
+                        <button id="detail-buy-now" class="w-full border border-earth text-earth py-3 rounded-full hover:bg-earth hover:text-white transition font-medium tracking-wide">Buy Now</button>
                     </div>
-                    <button class="w-full border border-earth text-earth py-3 rounded-full hover:bg-earth hover:text-white transition font-medium tracking-wide">Buy Now</button>
                 </div>
             </div>
         </section>

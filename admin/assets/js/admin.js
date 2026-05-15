@@ -1067,6 +1067,7 @@ const UI = {
             imagePosX:   parseInt(document.getElementById('imagePosX')?.value) ?? 50,
             imagePosY:   parseInt(document.getElementById('imagePosY')?.value) ?? 50
         };
+        if (!idVal) productData.createdAt = new Date().toISOString();
 
         const imageFile = document.getElementById('productImage').files[0];
         if (imageFile) {
