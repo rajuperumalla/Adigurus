@@ -312,7 +312,7 @@
 
     <!-- Product Modal -->
     <div id="productModal" class="modal" style="padding:12px;">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-auto flex flex-col" style="max-height:92vh;">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl mx-auto flex flex-col" style="max-height:92vh;">
             <!-- Sticky header — close button always visible -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl" style="position:sticky;top:0;z-index:20;flex-shrink:0;">
                 <h3 id="productModalTitle" class="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h3>
@@ -407,6 +407,7 @@
                     </div>
                 </div>
                 
+                <!-- Image Upload -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</label>
                     <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
@@ -418,49 +419,67 @@
                         </label>
                         <img id="imagePreview" class="mt-4 max-h-48 mx-auto rounded-lg hidden">
                     </div>
+                </div>
 
-                    <!-- Image Position Controls (visible when image uploaded) -->
-                    <div id="imageCropControls" class="hidden mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"><i class="fas fa-crop-alt mr-1"></i> Adjust Image Fit</p>
+                <!-- Image Adjust — side-by-side: Customer Preview (left) | Adjust Controls (right) -->
+                <div id="imageCropControls" class="hidden mt-0">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                        <!-- Drag-to-position area -->
-                        <div class="mb-3">
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Drag to set focal point</p>
-                            <div id="imageDragArea" class="relative w-full h-[200px] rounded-lg overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-500 cursor-crosshair bg-gray-100 dark:bg-gray-800" style="touch-action:none;">
+                        <!-- LEFT: Customer View Preview -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col">
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide flex items-center gap-1.5">
+                                <i class="fas fa-eye text-[#4A6741]"></i> Customer View Preview
+                            </p>
+                            <div class="flex-1 flex items-center justify-center">
+                                <div id="customerPreviewCard" class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg w-full max-w-[240px]">
+                                    <div class="w-full h-[200px] bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 relative overflow-hidden">
+                                        <img id="customerPreviewImg" src="" class="w-full h-full" style="object-fit:cover;object-position:50% 50%;">
+                                    </div>
+                                    <div class="p-3">
+                                        <span id="customerPreviewCategory" class="text-[10px] font-semibold text-[#4A6741]">Category</span>
+                                        <p id="customerPreviewName" class="text-sm font-bold text-gray-800 dark:text-white mt-0.5 leading-tight">Product Name</p>
+                                        <p id="customerPreviewPrice" class="text-sm font-bold text-[#4A6741] mt-1">&#8377;0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-400 text-center mt-3">This is how the product appears to customers</p>
+                        </div>
+
+                        <!-- RIGHT: Adjust Image Fit -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col">
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide flex items-center gap-1.5">
+                                <i class="fas fa-crop-alt text-[#D4AF37]"></i> Adjust Image Fit
+                            </p>
+
+                            <!-- Drag-to-position area -->
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1"><i class="fas fa-arrows-alt text-xs"></i> Drag to set focal point</p>
+                            <div id="imageDragArea" class="relative w-full h-[160px] rounded-lg overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-500 cursor-crosshair bg-gray-100 dark:bg-gray-800 mb-2" style="touch-action:none;">
                                 <img id="dragAreaImg" src="" class="w-full h-full" style="object-fit:cover;object-position:50% 50%;pointer-events:none;">
                                 <div id="dragCrosshair" class="absolute w-5 h-5 rounded-full border-2 border-white shadow-lg" style="background:rgba(74,103,65,0.7);transform:translate(-50%,-50%);left:50%;top:50%;pointer-events:none;"></div>
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-1 text-center">Position: <span id="posXVal">50</span>% x <span id="posYVal">50</span>%</p>
-                        </div>
+                            <p class="text-[10px] text-gray-400 mb-3 text-center">Position: <span id="posXVal">50</span>% × <span id="posYVal">50</span>%</p>
 
-                        <!-- Zoom controls -->
-                        <div class="flex items-center gap-3 mb-3">
-                            <button type="button" onclick="Admin.zoomOut()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-lg font-bold">−</button>
-                            <div class="flex-1 text-center">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">Zoom: <span id="zoomVal">1.0x</span></span>
-                                <input type="range" id="imageZoom" min="100" max="300" value="100" class="w-full accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                            <!-- Zoom controls -->
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1"><i class="fas fa-search-plus text-xs"></i> Zoom Level</p>
+                            <div class="flex items-center gap-2 mb-3">
+                                <button type="button" onclick="Admin.zoomOut()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-base font-bold flex-shrink-0">−</button>
+                                <div class="flex-1">
+                                    <input type="range" id="imageZoom" min="100" max="300" value="100" class="w-full accent-[#4A6741] h-1.5" oninput="Admin.updateImagePreview()">
+                                </div>
+                                <button type="button" onclick="Admin.zoomIn()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-base font-bold flex-shrink-0">+</button>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 w-10 text-center font-medium flex-shrink-0" id="zoomVal">1.0x</span>
                             </div>
-                            <button type="button" onclick="Admin.zoomIn()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-500 transition text-lg font-bold">+</button>
-                        </div>
 
-                        <input type="hidden" id="imagePosX" value="50">
-                        <input type="hidden" id="imagePosY" value="50">
-                        <button type="button" onclick="Admin.resetImagePosition()" class="text-xs text-[#4A6741] hover:underline">Reset to Default</button>
+                            <input type="hidden" id="imagePosX" value="50">
+                            <input type="hidden" id="imagePosY" value="50">
 
-                        <!-- Customer Preview Card -->
-                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Customer View Preview</p>
-                            <div id="customerPreviewCard" class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md max-w-[220px] mx-auto">
-                                <div class="w-full h-[180px] bg-gradient-to-br from-[#4A6741]/10 to-[#D4AF37]/10 relative overflow-hidden">
-                                    <img id="customerPreviewImg" src="" class="w-full h-full" style="object-fit:cover;object-position:50% 50%;">
-                                </div>
-                                <div class="p-3">
-                                    <span id="customerPreviewCategory" class="text-[10px] font-semibold text-[#4A6741]">Category</span>
-                                    <p id="customerPreviewName" class="text-sm font-bold text-gray-800 dark:text-white mt-0.5 leading-tight">Product Name</p>
-                                    <p id="customerPreviewPrice" class="text-sm font-bold text-[#4A6741] mt-1">&#8377;0</p>
-                                </div>
+                            <div class="mt-auto pt-2">
+                                <button type="button" onclick="Admin.resetImagePosition()" class="w-full text-xs text-center py-1.5 rounded-lg border border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                    <i class="fas fa-undo mr-1"></i> Reset to Default
+                                </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 
