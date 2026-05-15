@@ -962,6 +962,7 @@ const UI = {
                 document.getElementById('imagePosX').value = product.imagePosX ?? 50;
                 document.getElementById('imagePosY').value = product.imagePosY ?? 50;
                 this.updateImagePreview();
+                this.initDragArea();
             }
         } else {
             title.textContent = 'Add New Product';
@@ -990,6 +991,7 @@ const UI = {
             document.getElementById('imagePosY').value = 50;
             document.getElementById('imageCropControls').classList.remove('hidden');
             this.updateImagePreview();
+            this.initDragArea();
         };
         reader.readAsDataURL(file);
     },
@@ -999,8 +1001,23 @@ const UI = {
         const posX = document.getElementById('imagePosX').value;
         const posY = document.getElementById('imagePosY').value;
         document.getElementById('zoomVal').textContent = (zoom / 100).toFixed(1) + 'x';
-        document.getElementById('posXVal').textContent = posX + '%';
-        document.getElementById('posYVal').textContent = posY + '%';
+        const posXEl = document.getElementById('posXVal');
+        const posYEl = document.getElementById('posYVal');
+        if (posXEl) posXEl.textContent = posX;
+        if (posYEl) posYEl.textContent = posY;
+
+        const dragImg = document.getElementById('dragAreaImg');
+        if (dragImg) {
+            const src = document.getElementById('imagePreview').src;
+            if (src) dragImg.src = src;
+            dragImg.style.objectPosition = `${posX}% ${posY}%`;
+            dragImg.style.transform = `scale(${zoom / 100})`;
+        }
+        const crosshair = document.getElementById('dragCrosshair');
+        if (crosshair) {
+            crosshair.style.left = posX + '%';
+            crosshair.style.top = posY + '%';
+        }
         const cpImg = document.getElementById('customerPreviewImg');
         if (cpImg) {
             const src = document.getElementById('imagePreview').src;
@@ -1009,6 +1026,45 @@ const UI = {
             cpImg.style.transform = `scale(${zoom / 100})`;
         }
         this.updateCustomerPreview();
+    },
+
+    initDragArea() {
+        const area = document.getElementById('imageDragArea');
+        if (!area || area._dragBound) return;
+        area._dragBound = true;
+        let dragging = false;
+
+        const setPos = (e) => {
+            const rect = area.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let x = Math.round(((clientX - rect.left) / rect.width) * 100);
+            let y = Math.round(((clientY - rect.top) / rect.height) * 100);
+            x = Math.max(0, Math.min(100, x));
+            y = Math.max(0, Math.min(100, y));
+            document.getElementById('imagePosX').value = x;
+            document.getElementById('imagePosY').value = y;
+            this.updateImagePreview();
+        };
+
+        area.addEventListener('mousedown', (e) => { dragging = true; setPos(e); });
+        area.addEventListener('touchstart', (e) => { dragging = true; setPos(e); e.preventDefault(); }, {passive: false});
+        document.addEventListener('mousemove', (e) => { if (dragging) setPos(e); });
+        document.addEventListener('touchmove', (e) => { if (dragging) setPos(e); }, {passive: true});
+        document.addEventListener('mouseup', () => { dragging = false; });
+        document.addEventListener('touchend', () => { dragging = false; });
+    },
+
+    zoomIn() {
+        const el = document.getElementById('imageZoom');
+        el.value = Math.min(300, parseInt(el.value) + 20);
+        this.updateImagePreview();
+    },
+
+    zoomOut() {
+        const el = document.getElementById('imageZoom');
+        el.value = Math.max(100, parseInt(el.value) - 20);
+        this.updateImagePreview();
     },
 
     onCategoryChange(value) {
