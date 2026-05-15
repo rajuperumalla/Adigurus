@@ -334,8 +334,82 @@ const CartUI = {
 
     bump() {
         if (!this.badge) return;
-        this.badge.classList.add('scale-150');
-        setTimeout(() => this.badge.classList.remove('scale-150'), 300);
+        
+        // 1. Badge pop
+        this.badge.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        this.badge.style.transform = 'scale(1.8) rotate(15deg)';
+        this.badge.style.backgroundColor = '#10b981'; // Green
+        
+        setTimeout(() => {
+            this.badge.style.transform = 'scale(1) rotate(0deg)';
+            this.badge.style.backgroundColor = '';
+        }, 600);
+
+        // 2. Button jiggle, ripple, and floating +1
+        const cartBtn = document.getElementById('cart-btn');
+        if (cartBtn) {
+            cartBtn.style.position = 'relative';
+            
+            // Jiggle animation
+            cartBtn.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.1) rotate(-8deg)', offset: 0.2 },
+                { transform: 'scale(1.1) rotate(8deg)', offset: 0.4 },
+                { transform: 'scale(1.1) rotate(-8deg)', offset: 0.6 },
+                { transform: 'scale(1.1) rotate(8deg)', offset: 0.8 },
+                { transform: 'scale(1)' }
+            ], {
+                duration: 500,
+                easing: 'ease-in-out'
+            });
+
+            // Ripple ring
+            const ring = document.createElement('div');
+            ring.style.cssText = `
+                position: absolute;
+                top: 50%; left: 50%;
+                width: 40px; height: 40px;
+                background: rgba(16, 185, 129, 0.5);
+                border-radius: 50%;
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+                pointer-events: none;
+                z-index: -1;
+            `;
+            cartBtn.appendChild(ring);
+            
+            ring.animate([
+                { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 1 },
+                { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+            ], {
+                duration: 800,
+                easing: 'ease-out'
+            }).onfinish = () => ring.remove();
+
+            // Floating +1
+            const floatMsg = document.createElement('div');
+            floatMsg.innerHTML = '<i class="fas fa-plus" style="font-size:10px;"></i>1';
+            floatMsg.style.cssText = `
+                position: absolute;
+                top: -10px;
+                right: -5px;
+                color: #10b981;
+                font-weight: 900;
+                font-size: 14px;
+                pointer-events: none;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                z-index: 50;
+            `;
+            cartBtn.appendChild(floatMsg);
+            
+            floatMsg.animate([
+                { transform: 'translateY(0) scale(1)', opacity: 1 },
+                { transform: 'translateY(-35px) scale(1.5)', opacity: 0 }
+            ], {
+                duration: 900,
+                easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+            }).onfinish = () => floatMsg.remove();
+        }
     },
 
     refresh() {
