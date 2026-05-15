@@ -577,6 +577,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Load admin-uploaded products on shop page ────────
     loadDynamicProducts();
 
+    // ── Load products on category pages ──────────────────
+    loadCategoryPageProducts();
+
     // ── Load product detail page ─────────────────────────
     loadProductDetailPage();
 
@@ -969,6 +972,47 @@ async function loadProductDetailPage() {
     } catch {
         document.getElementById('product-loading').style.display = 'none';
         document.getElementById('product-error').classList.remove('hidden');
+    }
+}
+
+async function loadCategoryPageProducts() {
+    const grid = document.getElementById('category-products-grid');
+    if (!grid) return;
+
+    const categories = (grid.dataset.category || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+    const keywords = (grid.dataset.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
+    const showAll = grid.dataset.filter === 'all';
+    const badgeFilter = (grid.dataset.badge || '').split(',').map(b => b.trim().toLowerCase()).filter(Boolean);
+    const discountOnly = grid.dataset.discount === 'true';
+
+    try {
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        const products = await res.json();
+        if (!Array.isArray(products)) throw new Error('Invalid API response');
+
+        let filtered = products;
+        if (!showAll) {
+            filtered = products.filter(p => {
+                const cat = (p.category || '').toLowerCase();
+                const name = (p.name || '').toLowerCase();
+                const desc = (p.description || '').toLowerCase();
+                const badge = (p.badge || '').toLowerCase();
+
+                if (categories.length && categories.some(c => cat.includes(c))) return true;
+                if (keywords.length && keywords.some(k => name.includes(k) || desc.includes(k))) return true;
+                if (badgeFilter.length && badgeFilter.some(b => badge.includes(b))) return true;
+                if (discountOnly && p.discount > 0) return true;
+                return false;
+            });
+        }
+
+        grid.innerHTML = filtered.length === 0
+            ? '<p class="text-center text-gray-400 col-span-full py-16">No products found in this category.</p>'
+            : filtered.map(_renderProductCard).join('');
+
+        wireProductCards();
+    } catch {
+        grid.innerHTML = '<p class="text-center text-gray-400 col-span-full py-12">Unable to load products. Please try again later.</p>';
     }
 }
 
