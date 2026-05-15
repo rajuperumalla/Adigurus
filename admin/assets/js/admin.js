@@ -823,7 +823,6 @@ const UI = {
                         <option value="Pain Relief">Pain Relief</option>
                         <option value="Skin Care">Skin Care</option>
                         <option value="Wellness">Wellness</option>
-                        <option value="Supplements">Supplements</option>
                     </select>
                     <button onclick="Admin.openProductModal()" class="btn-primary text-white font-semibold px-6 py-2 rounded-lg hover:shadow-lg transition flex items-center gap-2">
                         <i class="fas fa-plus"></i> Add Product
@@ -931,7 +930,7 @@ const UI = {
             title.textContent = 'Edit Product';
             document.getElementById('editProductId').value     = product.id;
             document.getElementById('productName').value       = product.name;
-            const knownCats = ['Hair Care','Pain Relief','Skin Care','Wellness','Supplements','Digestive Care','Immunity',"Women's Health","Men's Health","Baby Care"];
+            const knownCats = ['Hair Care','Pain Relief','Skin Care','Wellness','Digestive Care','Immunity',"Women's Health","Men's Health","Baby Care"];
             const catSel = document.getElementById('productCategory');
             const customCatInput = document.getElementById('customCategory');
             if (knownCats.includes(product.category)) {
@@ -1217,7 +1216,6 @@ const UI = {
                 <option value="Pain Relief">Pain Relief</option>
                 <option value="Skin Care">Skin Care</option>
                 <option value="Wellness">Wellness</option>
-                <option value="Supplements">Supplements</option>
             `;
         } else if (scope === 'product') {
             select.innerHTML = `
