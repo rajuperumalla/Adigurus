@@ -419,7 +419,8 @@ function wireProductCards() {
             if (items.some(i => i.id === id)) {
                 addBtn.dataset.added = 'true';
                 addBtn.textContent = 'Go to Cart';
-                addBtn.classList.add('bg-green-600');
+                addBtn.style.backgroundColor = '#16a34a';
+                addBtn.style.color = '#ffffff';
                 addBtn.classList.remove('bg-earth');
             }
 
@@ -431,7 +432,8 @@ function wireProductCards() {
                 Cart.add({ id, name, price, icon, qty });
                 addBtn.dataset.added = 'true';
                 addBtn.textContent = 'Go to Cart';
-                addBtn.classList.add('bg-green-600');
+                addBtn.style.backgroundColor = '#16a34a';
+                addBtn.style.color = '#ffffff';
                 addBtn.classList.remove('bg-earth');
             });
         }
@@ -467,7 +469,8 @@ function wireProductCards() {
             if (items.some(i => i.id === id)) {
                 detailAddBtn.dataset.added = 'true';
                 detailAddBtn.textContent = 'Go to Cart';
-                detailAddBtn.classList.add('bg-green-600');
+                detailAddBtn.style.backgroundColor = '#16a34a';
+                detailAddBtn.style.color = '#ffffff';
                 detailAddBtn.classList.remove('bg-earth');
             }
             detailAddBtn.addEventListener('click', () => {
@@ -478,7 +481,8 @@ function wireProductCards() {
                 Cart.add({id, name, price, icon, qty});
                 detailAddBtn.dataset.added = 'true';
                 detailAddBtn.textContent = 'Go to Cart';
-                detailAddBtn.classList.add('bg-green-600');
+                detailAddBtn.style.backgroundColor = '#16a34a';
+                detailAddBtn.style.color = '#ffffff';
                 detailAddBtn.classList.remove('bg-earth');
             });
         }
