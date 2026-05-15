@@ -279,6 +279,21 @@ const CartUI = {
             window.location.href = 'checkout.html';
         });
 
+        // Click outside drawer closes cart
+        document.addEventListener('click', (e) => {
+            if (!this.drawer || this.drawer.classList.contains('translate-x-full')) return;
+            const clickedInsideDrawer = this.drawer.contains(e.target);
+            const clickedCartBtn = cartBtn && cartBtn.contains(e.target);
+            if (!clickedInsideDrawer && !clickedCartBtn) this.close();
+        });
+
+        // Escape key closes cart
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.drawer && !this.drawer.classList.contains('translate-x-full')) {
+                this.close();
+            }
+        });
+
         // Swipe to close on mobile (touch gesture support)
         this.initSwipeGesture();
 
