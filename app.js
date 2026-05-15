@@ -198,7 +198,6 @@ const Cart = {
         }
         this.save(items);
         CartUI.refresh();
-        CartUI.open();
         CartUI.bump();
     },
 
