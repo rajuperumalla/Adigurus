@@ -229,10 +229,10 @@ html.dark .bg-gradient-earth-text {
         min-width: 44px;
     }
     
-    /* Cart drawer takes 80% on mobile, leaving 20% to tap outside and close */
+    /* Cart drawer takes 85% on mobile, leaving 15% to tap outside and close */
     #cart-drawer {
-        width: 80vw !important;
-        max-width: 80vw !important;
+        width: 85vw !important;
+        max-width: 85vw !important;
     }
 }
 
