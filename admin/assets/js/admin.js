@@ -915,7 +915,6 @@ const UI = {
         const preview = document.getElementById('imagePreview');
 
         form.reset();
-        preview.classList.add('hidden');
         preview.removeAttribute('src');
 
         // Reset badge fields
