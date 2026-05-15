@@ -415,17 +415,24 @@ function wireProductCards() {
         }
 
         if (addBtn) {
-            addBtn.addEventListener('click', () => {
-                Cart.add({ id, name, price, icon, qty });
-                // Flash button
-                addBtn.textContent = '✓ Added!';
+            const items = Cart.get();
+            if (items.some(i => i.id === id)) {
+                addBtn.dataset.added = 'true';
+                addBtn.textContent = 'Go to Cart';
                 addBtn.classList.add('bg-green-600');
                 addBtn.classList.remove('bg-earth');
-                setTimeout(() => {
-                    addBtn.textContent = 'Add to Cart';
-                    addBtn.classList.remove('bg-green-600');
-                    addBtn.classList.add('bg-earth');
-                }, 1500);
+            }
+
+            addBtn.addEventListener('click', () => {
+                if (addBtn.dataset.added === 'true') {
+                    CartUI.open();
+                    return;
+                }
+                Cart.add({ id, name, price, icon, qty });
+                addBtn.dataset.added = 'true';
+                addBtn.textContent = 'Go to Cart';
+                addBtn.classList.add('bg-green-600');
+                addBtn.classList.remove('bg-earth');
             });
         }
 
@@ -455,9 +462,26 @@ function wireProductCards() {
 
         if (detailMinus) detailMinus.addEventListener('click', () => { if(qty>1){qty--; detailQty.textContent=qty;} });
         if (detailPlus)  detailPlus.addEventListener('click',  () => { qty++; detailQty.textContent=qty; });
-        if (detailAddBtn) detailAddBtn.addEventListener('click', () => {
-            Cart.add({id, name, price, icon, qty});
-        });
+        if (detailAddBtn) {
+            const items = Cart.get();
+            if (items.some(i => i.id === id)) {
+                detailAddBtn.dataset.added = 'true';
+                detailAddBtn.textContent = 'Go to Cart';
+                detailAddBtn.classList.add('bg-green-600');
+                detailAddBtn.classList.remove('bg-earth');
+            }
+            detailAddBtn.addEventListener('click', () => {
+                if (detailAddBtn.dataset.added === 'true') {
+                    CartUI.open();
+                    return;
+                }
+                Cart.add({id, name, price, icon, qty});
+                detailAddBtn.dataset.added = 'true';
+                detailAddBtn.textContent = 'Go to Cart';
+                detailAddBtn.classList.add('bg-green-600');
+                detailAddBtn.classList.remove('bg-earth');
+            });
+        }
         if (detailBuyBtn) detailBuyBtn.addEventListener('click', () => {
             Cart.add({id, name, price, icon, qty});
             window.location.href = 'checkout.html';
